@@ -16,6 +16,7 @@ export enum DesignerTier {
 
 export enum DesignStyle {
   MODERN = "modern",
+  TRADITIONAL = "traditional",
   FARMHOUSE = "farmhouse",
   MID_CENTURY = "mid_century",
   SCANDINAVIAN = "scandinavian",
@@ -24,6 +25,11 @@ export enum DesignStyle {
   COASTAL = "coastal",
   MINIMALIST = "minimalist",
   TRANSITIONAL = "transitional",
+  CONTEMPORARY = "contemporary",
+  RUSTIC = "rustic",
+  ART_DECO = "art_deco",
+  ECLECTIC = "eclectic",
+  OTHER = "other",
 }
 
 export enum RoomType {
@@ -31,18 +37,28 @@ export enum RoomType {
   KITCHEN = "kitchen",
   LIVING_ROOM = "living_room",
   BEDROOM = "bedroom",
-  HOME_OFFICE = "home_office",
   DINING_ROOM = "dining_room",
-  OUTDOOR = "outdoor",
+  HOME_OFFICE = "home_office",
   LAUNDRY = "laundry",
+  MUDROOM = "mudroom",
   NURSERY = "nursery",
+  OUTDOOR = "outdoor",
   ENTRYWAY = "entryway",
+  GARAGE = "garage",
+  OTHER = "other",
 }
 
 export enum Difficulty {
   BEGINNER = "beginner",
   INTERMEDIATE = "intermediate",
   ADVANCED = "advanced",
+}
+
+export enum BudgetTier {
+  BUDGET_UNDER_1000 = "budget_under_1000",
+  MID_1000_5000 = "mid_1000_5000",
+  PREMIUM_5000_15000 = "premium_5000_15000",
+  LUXURY_15000_PLUS = "luxury_15000_plus",
 }
 
 export enum OrderStatus {
@@ -342,24 +358,31 @@ export interface ProductTag {
 
 export interface DesignIdea {
   id: string;
+  designer_id: string;
   title: string;
   description: string;
-  photos: string[];
-  before_photo: string | null;
   room_type: RoomType;
   style: DesignStyle;
-  difficulty: Difficulty;
-  diy_friendly: boolean;
-  budget: number;
-  designer: DesignerProfile;
-  product_tags: ProductTag[];
-  likes: number;
-  saves: number;
-  views: number;
-  is_featured: boolean;
+  budget_tier: BudgetTier;
+  estimated_cost: number | null;
+  difficulty_level: Difficulty;
+  is_diy_friendly: boolean;
+  media_urls: string[];
+  primary_photo_url: string;
+  before_photo_url: string | null;
   tags: string[];
-  tips: string[];
+  product_tags: ProductTag[];
+  linked_bom_id: string | null;
+  view_count: number;
+  like_count: number;
+  save_count: number;
+  share_count: number;
+  is_published: boolean;
+  is_featured: boolean;
   created_at: string;
+  updated_at: string;
+  // Joined for display (not stored in design_ideas table)
+  designer?: DesignerProfile;
 }
 
 export interface DesignService {

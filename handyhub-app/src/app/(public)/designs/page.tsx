@@ -23,11 +23,12 @@ export default function DesignsPage() {
   const filtered = designIdeas.filter((d) => {
     if (roomFilter !== "all" && d.room_type !== roomFilter) return false;
     if (styleFilter !== "all" && d.style !== styleFilter) return false;
-    if (diyOnly && !d.diy_friendly) return false;
-    if (budget === "under1k" && d.budget >= 1000) return false;
-    if (budget === "1k-5k" && (d.budget < 1000 || d.budget >= 5000)) return false;
-    if (budget === "5k-15k" && (d.budget < 5000 || d.budget >= 15000)) return false;
-    if (budget === "15k+" && d.budget < 15000) return false;
+    if (diyOnly && !d.is_diy_friendly) return false;
+    const cost = d.estimated_cost ?? 0;
+    if (budget === "under1k" && cost >= 1000) return false;
+    if (budget === "1k-5k" && (cost < 1000 || cost >= 5000)) return false;
+    if (budget === "5k-15k" && (cost < 5000 || cost >= 15000)) return false;
+    if (budget === "15k+" && cost < 15000) return false;
     return true;
   });
 

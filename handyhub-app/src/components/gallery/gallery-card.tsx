@@ -39,7 +39,7 @@ export function GalleryCard({ design, className }: GalleryCardProps) {
         {/* Photo */}
         <div className="relative overflow-hidden">
           <Image
-            src={design.photos[0]}
+            src={design.primary_photo_url}
             alt={design.title}
             width={400}
             height={500}
@@ -62,7 +62,7 @@ export function GalleryCard({ design, className }: GalleryCardProps) {
           </button>
 
           {/* Before/After badge */}
-          {design.before_photo && (
+          {design.before_photo_url && (
             <Badge className="absolute left-2 top-2 bg-primary text-white">Before/After</Badge>
           )}
         </div>
@@ -72,19 +72,19 @@ export function GalleryCard({ design, className }: GalleryCardProps) {
           {/* Designer row */}
           <div className="flex items-center gap-1.5">
             <Image
-              src={design.designer.avatar_url ?? ""}
-              alt={design.designer.display_name}
+              src={design.designer?.avatar_url ?? ""}
+              alt={design.designer?.display_name ?? ""}
               width={20}
               height={20}
               className="size-5 rounded-full object-cover"
             />
-            <span className="truncate text-xs text-slate-600">{design.designer.display_name}</span>
-            <DesignerBadge tier={design.designer.designer_tier} size="sm" />
+            <span className="truncate text-xs text-slate-600">{design.designer?.display_name}</span>
+            {design.designer && <DesignerBadge tier={design.designer.designer_tier} size="sm" />}
           </div>
 
           {/* Title + budget */}
           <h3 className="line-clamp-2 text-sm font-semibold text-slate-800">
-            {design.title} &mdash; ${design.budget.toLocaleString()}
+            {design.title}{design.estimated_cost != null && <> &mdash; ${design.estimated_cost.toLocaleString()}</>}
           </h3>
 
           {/* Pills + stats */}
@@ -95,17 +95,17 @@ export function GalleryCard({ design, className }: GalleryCardProps) {
             <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-medium text-emerald-700">
               {styleLabel}
             </span>
-            <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-medium", difficultyStyles[design.difficulty])}>
-              {design.difficulty.charAt(0).toUpperCase() + design.difficulty.slice(1)}
+            <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-medium", difficultyStyles[design.difficulty_level])}>
+              {design.difficulty_level.charAt(0).toUpperCase() + design.difficulty_level.slice(1)}
             </span>
           </div>
 
           <div className="flex items-center gap-3 text-[11px] text-slate-400">
             <span className="flex items-center gap-0.5">
-              <Heart className="size-3" /> {formatCount(design.likes)}
+              <Heart className="size-3" /> {formatCount(design.like_count)}
             </span>
             <span className="flex items-center gap-0.5">
-              <Bookmark className="size-3" /> {formatCount(design.saves)}
+              <Bookmark className="size-3" /> {formatCount(design.save_count)}
             </span>
           </div>
         </div>

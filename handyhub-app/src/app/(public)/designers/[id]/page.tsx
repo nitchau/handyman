@@ -21,7 +21,7 @@ function formatLabel(val: string): string {
 export default function DesignerProfilePage({ params }: DesignerProfilePageProps) {
   const { id } = use(params);
   const designer = designers.find((d) => d.id === id) ?? designers[0];
-  const designs = designIdeas.filter((d) => d.designer.id === designer.id);
+  const designs = designIdeas.filter((d) => d.designer_id === designer.id);
   const services = designerServices.filter((s) => s.designer_id === designer.id);
   const reviews = designerReviews;
 
