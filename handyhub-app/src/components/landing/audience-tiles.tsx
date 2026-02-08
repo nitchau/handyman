@@ -99,11 +99,11 @@ export function AudienceTiles() {
           bullets={[
             {
               icon: <Camera className="size-4" />,
-              text: "Upload photos \u2192 get an instant material list",
+              text: "Upload photos → get an instant material list",
             },
             {
               icon: <DollarSign className="size-4" />,
-              text: "AI finds the best price across Home Depot, Lowe\u2019s, Amazon & more",
+              text: "AI finds the best price across Home Depot, Lowe's, Amazon & more",
             },
             {
               icon: <Wrench className="size-4" />,
@@ -148,7 +148,7 @@ export function AudienceTiles() {
         {/* Tile 3 — Contractor */}
         <Tile
           icon={<HardHat className="size-7" />}
-          title="I\u2019m a Professional"
+          title="I'm a Professional"
           subtitle="Get real jobs. No lead fees. Get paid through secure escrow."
           bullets={[
             {
