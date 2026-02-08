@@ -14,9 +14,9 @@ import { Button } from "@/components/ui/button";
 
 const navLinks = [
   { label: "Design Ideas", href: "/designs" },
+  { label: "Find Pros", href: "/contractors" },
+  { label: "Tool Rentals", href: "/tools" },
   { label: "How It Works", href: "#how-it-works" },
-  { label: "For Pros", href: "#for-pros" },
-  { label: "Price Comparison", href: "#pricing" },
 ];
 
 export function Navbar() {

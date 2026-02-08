@@ -431,3 +431,92 @@ export interface BookingFormState {
   budget: number;
   notes: string;
 }
+
+// ── Contractor Search / Profile Types ─────────────────────────────────
+
+export interface ContractorListing {
+  id: string;
+  name: string;
+  avatar_url: string;
+  cover_url: string;
+  verified: boolean;
+  rating_avg: number;
+  review_count: number;
+  location: string;
+  distance_miles: number;
+  specialties: string[];
+  hourly_rate: number;
+  bio: string;
+  years_experience: number;
+  completion_rate: number;
+  credentials: string[];
+  availability: { day: string; hours: string }[];
+  portfolio: { id: string; title: string; image_url: string; category: string; location: string; year: string }[];
+}
+
+export interface ContractorReview {
+  id: string;
+  client_initials: string;
+  client_name: string;
+  rating: number;
+  text: string;
+  date: string;
+  location: string;
+  reply: string | null;
+}
+
+// ── Messaging Types ──────────────────────────────────────────────────
+
+export interface ChatConversation {
+  id: string;
+  name: string;
+  avatar_url: string;
+  last_message: string;
+  timestamp: string;
+  unread: number;
+  online: boolean;
+  badge: string | null;
+}
+
+export interface ChatMessage {
+  id: string;
+  sender: "user" | "contractor";
+  text: string;
+  timestamp: string;
+  image_url?: string;
+  quote?: {
+    id: string;
+    title: string;
+    amount: number;
+    image_url: string;
+    description: string;
+  };
+}
+
+export interface ChatProject {
+  id: string;
+  title: string;
+  status: string;
+  amount: number;
+  service_request_id: string;
+}
+
+// ── Tool Rental Types ────────────────────────────────────────────────
+
+export interface ToolListing {
+  id: string;
+  name: string;
+  image_url: string;
+  category: string;
+  rating: number;
+  distance_miles: number;
+  price_per_day: number;
+  available: boolean;
+  available_date?: string;
+}
+
+export interface ToolCategory {
+  id: string;
+  label: string;
+  icon: string;
+}

@@ -2,6 +2,7 @@ import {
   Hammer,
   Home,
   HardHat,
+  Palette,
   Camera,
   DollarSign,
   Wrench,
@@ -13,7 +14,11 @@ import {
   ListChecks,
   Milestone,
   CheckCircle2,
+  Upload,
+  TrendingUp,
+  Star,
 } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -36,6 +41,7 @@ interface TileProps {
   subtitle: string;
   bullets: BulletItem[];
   ctaLabel: string;
+  ctaHref: string;
   ctaVariant: "default" | "outline";
   featured?: boolean;
 }
@@ -46,6 +52,7 @@ function Tile({
   subtitle,
   bullets,
   ctaLabel,
+  ctaHref,
   ctaVariant,
   featured,
 }: TileProps) {
@@ -78,9 +85,11 @@ function Tile({
         </ul>
       </CardContent>
       <CardFooter>
-        <Button variant={ctaVariant} className="w-full" size="lg">
-          {ctaLabel}
-        </Button>
+        <Link href={ctaHref} className="w-full">
+          <Button variant={ctaVariant} className="w-full" size="lg">
+            {ctaLabel}
+          </Button>
+        </Link>
       </CardFooter>
     </Card>
   );
@@ -88,8 +97,11 @@ function Tile({
 
 export function AudienceTiles() {
   return (
-    <section className="px-4 py-16 sm:px-6 lg:px-8">
-      <div className="mx-auto grid max-w-7xl gap-6 md:grid-cols-3">
+    <section className="px-4 py-12 sm:px-6 lg:px-8">
+      <h2 className="mb-12 text-center text-2xl font-bold text-slate-900">
+        Choose Your Path
+      </h2>
+      <div className="mx-auto grid max-w-7xl gap-6 md:grid-cols-2 lg:grid-cols-4">
         {/* Tile 1 — DIY */}
         <Tile
           featured
@@ -115,6 +127,7 @@ export function AudienceTiles() {
             },
           ]}
           ctaLabel="Start Planning"
+          ctaHref="/plan"
           ctaVariant="default"
         />
 
@@ -142,6 +155,7 @@ export function AudienceTiles() {
             },
           ]}
           ctaLabel="Find a Pro"
+          ctaHref="/contractors"
           ctaVariant="outline"
         />
 
@@ -169,6 +183,35 @@ export function AudienceTiles() {
             },
           ]}
           ctaLabel="Join as a Pro"
+          ctaHref="/for-contractors"
+          ctaVariant="outline"
+        />
+
+        {/* Tile 4 — Interior Designer */}
+        <Tile
+          icon={<Palette className="size-7" />}
+          title="I'm a Designer"
+          subtitle="Sell your design inspiration and earn from your creative eye."
+          bullets={[
+            {
+              icon: <Upload className="size-4" />,
+              text: "Upload room designs and mood boards",
+            },
+            {
+              icon: <DollarSign className="size-4" />,
+              text: "Earn from design purchases and commissions",
+            },
+            {
+              icon: <Star className="size-4" />,
+              text: "Get featured in our curated gallery",
+            },
+            {
+              icon: <TrendingUp className="size-4" />,
+              text: "Build your brand and grow your audience",
+            },
+          ]}
+          ctaLabel="Start Selling Designs"
+          ctaHref="/dashboard/designer"
           ctaVariant="outline"
         />
       </div>

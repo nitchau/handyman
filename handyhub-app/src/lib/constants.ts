@@ -68,13 +68,16 @@ export const DASHBOARD_NAV: Record<string, NavItem[]> = {
     { label: "My Plans", href: "/dashboard/plans", icon: "ClipboardList" },
     { label: "Design Ideas", href: "/designs", icon: "Palette" },
     { label: "Post a Project", href: "/dashboard/projects/new", icon: "PlusCircle" },
-    { label: "Find a Contractor", href: "/search", icon: "Search" },
+    { label: "Find a Contractor", href: "/contractors", icon: "Search" },
+    { label: "Tool Rentals", href: "/tools", icon: "Wrench" },
+    { label: "Messages", href: "/dashboard/messages", icon: "MessageSquare" },
     { label: "Settings", href: "/dashboard/settings", icon: "Settings" },
   ],
   contractor: [
     { label: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
     { label: "Find Work", href: "/dashboard/find-work", icon: "Briefcase" },
     { label: "My Projects", href: "/dashboard/projects", icon: "FolderOpen" },
+    { label: "Messages", href: "/dashboard/messages", icon: "MessageSquare" },
     { label: "Settings", href: "/dashboard/settings", icon: "Settings" },
   ],
   designer: [

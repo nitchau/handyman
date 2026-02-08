@@ -3,6 +3,7 @@ import {
   Hero,
   AudienceTiles,
   HowItWorks,
+  InspirationBanner,
   TrustStrip,
   Footer,
 } from "@/components/landing";
@@ -15,6 +16,7 @@ export default function LandingPage() {
         <Hero />
         <AudienceTiles />
         <HowItWorks />
+        <InspirationBanner />
         <TrustStrip />
       </main>
       <Footer />
