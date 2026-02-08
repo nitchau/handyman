@@ -424,6 +424,17 @@ const config = {
 
 ---
 
+## AI Provider
+
+| Provider | Usage |
+|----------|-------|
+| **Google Gemini** | Server-side AI features: project planning, materials list generation, cost estimation, contractor matching |
+| **Nano Banana (Gemini)** | Client-side / lightweight AI tasks |
+
+> **Note:** No OpenAI APIs are used in this project. All AI capabilities are powered by Google Gemini and Nano Banana.
+
+---
+
 ## Stitch Project References
 
 - **Main project:** `projects/12385649108249240626` — 14 screens
