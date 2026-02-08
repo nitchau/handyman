@@ -20,6 +20,10 @@ export const ROLES = {
     label: "Contractor",
     description: "I'm a professional",
   },
+  designer: {
+    label: "Designer",
+    description: "I create design inspiration",
+  },
   admin: { label: "Admin", description: "Platform administrator" },
 } as const;
 
@@ -53,6 +57,7 @@ export const DASHBOARD_NAV: Record<string, NavItem[]> = {
     { label: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
     { label: "My Projects", href: "/dashboard/projects", icon: "FolderOpen" },
     { label: "My Plans", href: "/dashboard/plans", icon: "ClipboardList" },
+    { label: "Design Ideas", href: "/designs", icon: "Palette" },
     { label: "Plan a Project", href: "/plan", icon: "Lightbulb" },
     { label: "Tool Rentals", href: "/tools", icon: "Wrench" },
     { label: "Settings", href: "/dashboard/settings", icon: "Settings" },
@@ -61,6 +66,7 @@ export const DASHBOARD_NAV: Record<string, NavItem[]> = {
     { label: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
     { label: "My Projects", href: "/dashboard/projects", icon: "FolderOpen" },
     { label: "My Plans", href: "/dashboard/plans", icon: "ClipboardList" },
+    { label: "Design Ideas", href: "/designs", icon: "Palette" },
     { label: "Post a Project", href: "/dashboard/projects/new", icon: "PlusCircle" },
     { label: "Find a Contractor", href: "/search", icon: "Search" },
     { label: "Settings", href: "/dashboard/settings", icon: "Settings" },
@@ -69,6 +75,14 @@ export const DASHBOARD_NAV: Record<string, NavItem[]> = {
     { label: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
     { label: "Find Work", href: "/dashboard/find-work", icon: "Briefcase" },
     { label: "My Projects", href: "/dashboard/projects", icon: "FolderOpen" },
+    { label: "Settings", href: "/dashboard/settings", icon: "Settings" },
+  ],
+  designer: [
+    { label: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
+    { label: "My Designs", href: "/dashboard/designs", icon: "Palette" },
+    { label: "Orders", href: "/dashboard/orders", icon: "ShoppingBag" },
+    { label: "Earnings", href: "/dashboard/earnings", icon: "DollarSign" },
+    { label: "Upload Design", href: "/dashboard/upload", icon: "Upload" },
     { label: "Settings", href: "/dashboard/settings", icon: "Settings" },
   ],
   admin: [

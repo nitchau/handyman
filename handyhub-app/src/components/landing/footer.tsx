@@ -3,6 +3,7 @@ import Link from "next/link";
 
 const footerLinks = {
   Platform: [
+    { label: "Design Ideas", href: "/designs" },
     { label: "How It Works", href: "#" },
     { label: "Price Comparison", href: "#" },
     { label: "Tool Rentals", href: "#" },

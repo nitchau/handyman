@@ -2,6 +2,8 @@ import { create } from "zustand";
 import type {
   AIAnalysisStatus,
   BomProject,
+  PreviewConversationTurn,
+  PreviewStatus,
   RoomDimensions,
 } from "@/types";
 
@@ -17,6 +19,12 @@ interface BomState {
   dimensions: RoomDimensions | null;
   analysisStatus: AIAnalysisStatus;
   result: BomProject | null;
+  error: string | null;
+  previewImage: string | null;
+  previewDescription: string | null;
+  previewHistory: PreviewConversationTurn[];
+  previewStatus: PreviewStatus;
+  previewError: string | null;
 
   setStep: (step: number) => void;
   nextStep: () => void;
@@ -27,6 +35,13 @@ interface BomState {
   setDimensions: (dims: RoomDimensions | null) => void;
   setAnalysisStatus: (status: AIAnalysisStatus) => void;
   setResult: (result: BomProject) => void;
+  setError: (error: string | null) => void;
+  setPreviewImage: (url: string | null) => void;
+  setPreviewDescription: (desc: string | null) => void;
+  addPreviewTurn: (turn: PreviewConversationTurn) => void;
+  setPreviewStatus: (status: PreviewStatus) => void;
+  setPreviewError: (error: string | null) => void;
+  resetPreview: () => void;
   reset: () => void;
 }
 
@@ -44,6 +59,12 @@ export const useBomStore = create<BomState>((set, get) => ({
   dimensions: null,
   analysisStatus: "idle" as AIAnalysisStatus,
   result: null,
+  error: null,
+  previewImage: null,
+  previewDescription: null,
+  previewHistory: [],
+  previewStatus: "idle" as PreviewStatus,
+  previewError: null,
 
   setStep: (step) => set({ currentStep: step }),
   nextStep: () => set({ currentStep: get().currentStep + 1 }),
@@ -74,6 +95,22 @@ export const useBomStore = create<BomState>((set, get) => ({
   setDimensions: (dims) => set({ dimensions: dims }),
   setAnalysisStatus: (status) => set({ analysisStatus: status }),
   setResult: (result) => set({ result }),
+  setError: (error) => set({ error }),
+
+  setPreviewImage: (url) => set({ previewImage: url }),
+  setPreviewDescription: (desc) => set({ previewDescription: desc }),
+  addPreviewTurn: (turn) =>
+    set({ previewHistory: [...get().previewHistory, turn] }),
+  setPreviewStatus: (status) => set({ previewStatus: status }),
+  setPreviewError: (error) => set({ previewError: error }),
+  resetPreview: () =>
+    set({
+      previewImage: null,
+      previewDescription: null,
+      previewHistory: [],
+      previewStatus: "idle" as PreviewStatus,
+      previewError: null,
+    }),
 
   reset: () => {
     // Revoke all object URLs before resetting
@@ -86,6 +123,12 @@ export const useBomStore = create<BomState>((set, get) => ({
       dimensions: null,
       analysisStatus: "idle" as AIAnalysisStatus,
       result: null,
+      error: null,
+      previewImage: null,
+      previewDescription: null,
+      previewHistory: [],
+      previewStatus: "idle" as PreviewStatus,
+      previewError: null,
     });
   },
 }));

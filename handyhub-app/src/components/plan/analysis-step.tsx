@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { Loader2, AlertCircle, RotateCcw } from "lucide-react";
 import { useBomStore } from "@/stores/bom-store";
-import { getMockBomResult } from "@/lib/mock/bom-results";
 import { AIAnalysisStatus } from "@/types";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
 
 const ANALYSIS_MESSAGES = [
   "Uploading your photos...",
@@ -17,46 +16,128 @@ const ANALYSIS_MESSAGES = [
 ];
 
 export function AnalysisStep() {
-  const router = useRouter();
-  const { projectData, setAnalysisStatus, setResult } = useBomStore();
+  const {
+    projectData,
+    mediaFiles,
+    dimensions,
+    nextStep,
+    setAnalysisStatus,
+    setResult,
+    error,
+    setError,
+  } = useBomStore();
   const [messageIndex, setMessageIndex] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [retryCount, setRetryCount] = useState(0);
+  const abortRef = useRef<AbortController | null>(null);
+
+  const handleRetry = useCallback(() => {
+    setError(null);
+    setMessageIndex(0);
+    setProgress(0);
+    setRetryCount((c) => c + 1);
+  }, [setError]);
 
   useEffect(() => {
     setAnalysisStatus(AIAnalysisStatus.ANALYZING);
+    setError(null);
 
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    // Progress animation — holds at 90% until real response
     const messageInterval = setInterval(() => {
       setMessageIndex((prev) =>
         prev < ANALYSIS_MESSAGES.length - 1 ? prev + 1 : prev
       );
-    }, 800);
+    }, 3000);
 
     const progressInterval = setInterval(() => {
-      setProgress((prev) => Math.min(prev + 2, 95));
-    }, 80);
+      setProgress((prev) => Math.min(prev + 1, 90));
+    }, 300);
 
-    const completeTimeout = setTimeout(() => {
-      clearInterval(messageInterval);
-      clearInterval(progressInterval);
-      setProgress(100);
+    // Build FormData and call API
+    const formData = new FormData();
+    formData.append("projectData", JSON.stringify(projectData));
+    if (dimensions) {
+      formData.append("dimensions", JSON.stringify(dimensions));
+    }
+    for (const file of mediaFiles) {
+      formData.append("images", file);
+    }
 
-      const result = getMockBomResult({
-        category_slug: projectData.category_slug,
-        description: projectData.description,
+    fetch("/api/generate-bom", {
+      method: "POST",
+      body: formData,
+      signal: controller.signal,
+    })
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || `Request failed (${res.status})`);
+        }
+        return data;
+      })
+      .then((result) => {
+        clearInterval(messageInterval);
+        clearInterval(progressInterval);
+        setProgress(100);
+        setResult(result);
+        setAnalysisStatus(AIAnalysisStatus.COMPLETE);
+        nextStep();
+      })
+      .catch((err: Error) => {
+        if (err.name === "AbortError") return;
+        clearInterval(messageInterval);
+        clearInterval(progressInterval);
+        setAnalysisStatus(AIAnalysisStatus.ERROR);
+        setError(err.message || "Something went wrong. Please try again.");
       });
 
-      setResult(result);
-      setAnalysisStatus(AIAnalysisStatus.COMPLETE);
-      router.push(`/dashboard/plans/${result.id}`);
-    }, 4000);
-
     return () => {
+      controller.abort();
       clearInterval(messageInterval);
       clearInterval(progressInterval);
-      clearTimeout(completeTimeout);
     };
-  }, [projectData, setAnalysisStatus, setResult, router]);
+  }, [
+    retryCount,
+    projectData,
+    mediaFiles,
+    dimensions,
+    setAnalysisStatus,
+    setResult,
+    setError,
+    nextStep,
+  ]);
 
+  // Error state
+  if (error) {
+    return (
+      <div className="space-y-8">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold tracking-tight text-slate-800">
+            Analysis failed
+          </h2>
+          <p className="mt-2 text-sm text-slate-500">
+            We couldn&apos;t generate your project plan. Please try again.
+          </p>
+        </div>
+
+        <div className="flex flex-col items-center gap-6 py-8">
+          <AlertCircle className="size-12 text-red-500" />
+
+          <p className="max-w-md text-center text-sm text-red-600">{error}</p>
+
+          <Button onClick={handleRetry} variant="outline" className="gap-2">
+            <RotateCcw className="size-4" />
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Analyzing state
   return (
     <div className="space-y-8">
       <div className="text-center">

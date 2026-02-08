@@ -5,11 +5,13 @@ import { StepProgress } from "@/components/ui/step-progress";
 import { CategoryStep } from "@/components/plan/category-step";
 import { MediaStep } from "@/components/plan/media-step";
 import { AnalysisStep } from "@/components/plan/analysis-step";
+import { PreviewStep } from "@/components/plan/preview-step";
 
 const STEPS = [
   { label: "Details" },
   { label: "Photos" },
   { label: "Analysis" },
+  { label: "Preview" },
 ];
 
 export function PlanWizard() {
@@ -22,6 +24,7 @@ export function PlanWizard() {
       {currentStep === 0 && <CategoryStep />}
       {currentStep === 1 && <MediaStep />}
       {currentStep === 2 && <AnalysisStep />}
+      {currentStep === 3 && <PreviewStep />}
     </div>
   );
 }

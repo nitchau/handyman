@@ -4,7 +4,54 @@ export enum UserRole {
   DIY_USER = "diy_user",
   HOMEOWNER = "homeowner",
   CONTRACTOR = "contractor",
+  DESIGNER = "designer",
   ADMIN = "admin",
+}
+
+export enum DesignerTier {
+  CREATOR = "creator",
+  VERIFIED = "verified",
+  FEATURED = "featured",
+}
+
+export enum DesignStyle {
+  MODERN = "modern",
+  FARMHOUSE = "farmhouse",
+  MID_CENTURY = "mid_century",
+  SCANDINAVIAN = "scandinavian",
+  INDUSTRIAL = "industrial",
+  BOHEMIAN = "bohemian",
+  COASTAL = "coastal",
+  MINIMALIST = "minimalist",
+  TRANSITIONAL = "transitional",
+}
+
+export enum RoomType {
+  BATHROOM = "bathroom",
+  KITCHEN = "kitchen",
+  LIVING_ROOM = "living_room",
+  BEDROOM = "bedroom",
+  HOME_OFFICE = "home_office",
+  DINING_ROOM = "dining_room",
+  OUTDOOR = "outdoor",
+  LAUNDRY = "laundry",
+  NURSERY = "nursery",
+  ENTRYWAY = "entryway",
+}
+
+export enum Difficulty {
+  BEGINNER = "beginner",
+  INTERMEDIATE = "intermediate",
+  ADVANCED = "advanced",
+}
+
+export enum OrderStatus {
+  NEW = "new",
+  IN_PROGRESS = "in_progress",
+  REVISION_REQUESTED = "revision_requested",
+  SCHEDULED = "scheduled",
+  COMPLETED = "completed",
+  CANCELLED = "cancelled",
 }
 
 export enum VerificationTier {
@@ -125,6 +172,16 @@ export interface BOMItem {
   created_at: string;
 }
 
+// ── Preview Types ─────────────────────────────────────────────────────
+
+export type PreviewStatus = "idle" | "generating" | "complete" | "error";
+
+export interface PreviewConversationTurn {
+  role: "user" | "model";
+  text?: string;
+  imageDataUrl?: string;
+}
+
 // ── BOM Engine Enums ──────────────────────────────────────────────────
 
 export enum SpaceType {
@@ -234,4 +291,143 @@ export interface BomProject {
   verification: BomVerification;
   created_at: string;
   updated_at: string;
+}
+
+// ── Design Gallery Types ────────────────────────────────────────────────
+
+export interface DesignerProfile {
+  id: string;
+  user_id: string;
+  name: string;
+  avatar_url: string;
+  cover_url: string;
+  tier: DesignerTier;
+  location: string;
+  accepts_remote: boolean;
+  bio: string;
+  specialties: DesignStyle[];
+  room_types: RoomType[];
+  credentials: string;
+  social_links: { platform: string; url: string }[];
+  rating_avg: number;
+  review_count: number;
+  design_count: number;
+  total_likes: number;
+  years_on_platform: number;
+  response_time_hours: number;
+}
+
+export interface ProductTag {
+  id: string;
+  name: string;
+  brand: string;
+  category: string;
+  price: string;
+  retailer: string;
+  retailer_url: string;
+  image_url: string;
+  position_x: number;
+  position_y: number;
+}
+
+export interface DesignIdea {
+  id: string;
+  title: string;
+  description: string;
+  photos: string[];
+  before_photo: string | null;
+  room_type: RoomType;
+  style: DesignStyle;
+  difficulty: Difficulty;
+  diy_friendly: boolean;
+  budget: number;
+  designer: DesignerProfile;
+  product_tags: ProductTag[];
+  likes: number;
+  saves: number;
+  views: number;
+  is_featured: boolean;
+  tags: string[];
+  tips: string[];
+  created_at: string;
+}
+
+export interface DesignService {
+  id: string;
+  designer_id: string;
+  title: string;
+  description: string;
+  delivery_days: string;
+  revisions: number;
+  price: number;
+}
+
+export interface DesignReview {
+  id: string;
+  client_name: string;
+  client_avatar: string;
+  rating: number;
+  service_title: string;
+  text: string;
+  designer_reply: string | null;
+  created_at: string;
+}
+
+// ── Designer Dashboard Types ──────────────────────────────────────────
+
+export interface DesignerOrder {
+  id: string;
+  client_name: string;
+  project_title: string;
+  status: OrderStatus;
+  due_date: string;
+  amount: number;
+}
+
+export interface DesignerStatCard {
+  label: string;
+  value: string;
+  trend: string;
+  trendDirection: "up" | "down" | "neutral";
+  iconBg: string;
+  iconColor: string;
+  icon: string;
+}
+
+export interface TopDesign {
+  id: string;
+  title: string;
+  image_url: string;
+  views: number;
+  likes: number;
+}
+
+// ── Upload Wizard Types ───────────────────────────────────────────────
+
+export interface UploadWizardState {
+  step: 1 | 2 | 3;
+  photos: string[];
+  heroIndex: number;
+  beforePhoto: string | null;
+  title: string;
+  description: string;
+  roomType: RoomType;
+  style: DesignStyle;
+  difficulty: Difficulty;
+  diyFriendly: boolean;
+  budget: string;
+  tags: string[];
+  productTags: { name: string; brand: string; price: string; category: string; url: string }[];
+}
+
+// ── Booking Types ─────────────────────────────────────────────────────
+
+export interface BookingFormState {
+  roomType: RoomType;
+  photos: string[];
+  dimensions: { length: number; width: number; height: number };
+  styleLikes: string[];
+  styleDislikes: string[];
+  budget: number;
+  notes: string;
 }
