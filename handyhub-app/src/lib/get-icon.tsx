@@ -1,0 +1,50 @@
+import {
+  Bath,
+  Briefcase,
+  ChefHat,
+  FolderOpen,
+  Grid3x3,
+  Hammer,
+  HardHat,
+  Home,
+  LayoutDashboard,
+  Lightbulb,
+  type LucideIcon,
+  Paintbrush,
+  PlusCircle,
+  Search,
+  Settings,
+  Sparkles,
+  Thermometer,
+  TreePine,
+  Users,
+  Wrench,
+  Zap,
+} from "lucide-react";
+
+const iconMap: Record<string, LucideIcon> = {
+  Bath,
+  Briefcase,
+  ChefHat,
+  FolderOpen,
+  Grid3x3,
+  Hammer,
+  HardHat,
+  Home,
+  LayoutDashboard,
+  Lightbulb,
+  Paintbrush,
+  PlusCircle,
+  Search,
+  Settings,
+  Sparkles,
+  Thermometer,
+  TreePine,
+  Users,
+  Wrench,
+  Zap,
+};
+
+export function getIcon(name: string): LucideIcon {
+  return iconMap[name] ?? Home;
+}
