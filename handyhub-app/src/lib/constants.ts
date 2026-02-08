@@ -52,6 +52,7 @@ export const DASHBOARD_NAV: Record<string, NavItem[]> = {
   diy_user: [
     { label: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
     { label: "My Projects", href: "/dashboard/projects", icon: "FolderOpen" },
+    { label: "My Plans", href: "/dashboard/plans", icon: "ClipboardList" },
     { label: "Plan a Project", href: "/plan", icon: "Lightbulb" },
     { label: "Tool Rentals", href: "/tools", icon: "Wrench" },
     { label: "Settings", href: "/dashboard/settings", icon: "Settings" },
@@ -59,6 +60,7 @@ export const DASHBOARD_NAV: Record<string, NavItem[]> = {
   homeowner: [
     { label: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
     { label: "My Projects", href: "/dashboard/projects", icon: "FolderOpen" },
+    { label: "My Plans", href: "/dashboard/plans", icon: "ClipboardList" },
     { label: "Post a Project", href: "/dashboard/projects/new", icon: "PlusCircle" },
     { label: "Find a Contractor", href: "/search", icon: "Search" },
     { label: "Settings", href: "/dashboard/settings", icon: "Settings" },

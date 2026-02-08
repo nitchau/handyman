@@ -111,6 +111,7 @@ export interface Milestone {
   created_at: string;
 }
 
+/** @deprecated Use BomItem instead */
 export interface BOMItem {
   id: string;
   project_id: string;
@@ -122,4 +123,115 @@ export interface BOMItem {
   category: string;
   notes: string | null;
   created_at: string;
+}
+
+// ── BOM Engine Enums ──────────────────────────────────────────────────
+
+export enum SpaceType {
+  BATHROOM = "bathroom",
+  KITCHEN = "kitchen",
+  BEDROOM = "bedroom",
+  LIVING_ROOM = "living_room",
+  GARAGE = "garage",
+  BASEMENT = "basement",
+  ATTIC = "attic",
+  OUTDOOR = "outdoor",
+  LAUNDRY = "laundry",
+  OTHER = "other",
+}
+
+export enum AIAnalysisStatus {
+  IDLE = "idle",
+  UPLOADING = "uploading",
+  ANALYZING = "analyzing",
+  COMPLETE = "complete",
+  ERROR = "error",
+}
+
+export enum ConfidenceTier {
+  AI_ESTIMATE = "ai_estimate",
+  PRO_VERIFIED = "pro_verified",
+  COMMUNITY_VALIDATED = "community_validated",
+}
+
+export enum BomItemType {
+  MATERIAL = "material",
+  TOOL = "tool",
+  SAFETY = "safety",
+  CONSUMABLE = "consumable",
+}
+
+export enum Retailer {
+  HOME_DEPOT = "home_depot",
+  LOWES = "lowes",
+  AMAZON = "amazon",
+}
+
+export enum VerificationStatus {
+  UNVERIFIED = "unverified",
+  PENDING = "pending",
+  VERIFIED = "verified",
+}
+
+// ── BOM Engine Interfaces ─────────────────────────────────────────────
+
+export interface RoomDimensions {
+  length_ft: number;
+  width_ft: number;
+  height_ft: number;
+}
+
+export interface ProductPriceComparison {
+  retailer: Retailer;
+  price: number;
+  url: string;
+  in_stock: boolean;
+}
+
+export interface BomItem {
+  id: string;
+  name: string;
+  type: BomItemType;
+  quantity: number;
+  unit: string;
+  confidence: number;
+  prices: ProductPriceComparison[];
+  notes: string | null;
+}
+
+export interface BomToolRequirement {
+  id: string;
+  name: string;
+  owned: boolean;
+  rental_price_per_day: number | null;
+  purchase_price: number | null;
+}
+
+export interface BomVerification {
+  status: VerificationStatus;
+  verified_by: string | null;
+  verified_at: string | null;
+  notes: string | null;
+}
+
+export interface BomProject {
+  id: string;
+  title: string;
+  category_slug: string;
+  space_type: SpaceType;
+  description: string;
+  dimensions: RoomDimensions | null;
+  photo_urls: string[];
+  confidence_tier: ConfidenceTier;
+  confidence_score: number;
+  items: BomItem[];
+  tools: BomToolRequirement[];
+  labor_hours_min: number;
+  labor_hours_max: number;
+  labor_cost_min: number;
+  labor_cost_max: number;
+  difficulty: "easy" | "moderate" | "hard";
+  verification: BomVerification;
+  created_at: string;
+  updated_at: string;
 }
