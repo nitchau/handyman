@@ -8,17 +8,17 @@ interface DesignerBadgeProps {
 }
 
 const tierConfig: Record<DesignerTier, { label: string; icon: string; className: string }> = {
-  [DesignerTier.CREATOR]: {
+  [DesignerTier.COMMUNITY_CREATOR]: {
     label: "Creator",
     icon: "\uD83C\uDFA8",
     className: "bg-slate-100 text-slate-700",
   },
-  [DesignerTier.VERIFIED]: {
+  [DesignerTier.VERIFIED_DESIGNER]: {
     label: "Verified",
     icon: "\uD83C\uDFA8\u2713",
     className: "bg-emerald-100 text-emerald-700",
   },
-  [DesignerTier.FEATURED]: {
+  [DesignerTier.FEATURED_DESIGNER]: {
     label: "Featured",
     icon: "\uD83C\uDFA8\u2B50",
     className: "bg-amber-100 text-amber-700 ring-1 ring-amber-300",

@@ -9,9 +9,9 @@ export enum UserRole {
 }
 
 export enum DesignerTier {
-  CREATOR = "creator",
-  VERIFIED = "verified",
-  FEATURED = "featured",
+  COMMUNITY_CREATOR = "community_creator",
+  VERIFIED_DESIGNER = "verified_designer",
+  FEATURED_DESIGNER = "featured_designer",
 }
 
 export enum DesignStyle {
@@ -298,23 +298,33 @@ export interface BomProject {
 export interface DesignerProfile {
   id: string;
   user_id: string;
-  name: string;
-  avatar_url: string;
-  cover_url: string;
-  tier: DesignerTier;
-  location: string;
-  accepts_remote: boolean;
-  bio: string;
-  specialties: DesignStyle[];
-  room_types: RoomType[];
-  credentials: string;
-  social_links: { platform: string; url: string }[];
+  display_name: string;
+  bio: string | null;
+  avatar_url: string | null;
+  cover_photo_url: string | null;
+  designer_tier: DesignerTier;
+  specialties: string[];
+  room_types: string[];
+  style_tags: string[];
+  portfolio_url: string | null;
+  instagram_handle: string | null;
+  tiktok_handle: string | null;
+  pinterest_handle: string | null;
+  credentials: string[];
+  credential_verified: boolean;
+  years_experience: number;
+  location_city: string | null;
+  location_state: string | null;
+  accepts_remote_clients: boolean;
   rating_avg: number;
   review_count: number;
-  design_count: number;
+  total_ideas_posted: number;
   total_likes: number;
-  years_on_platform: number;
-  response_time_hours: number;
+  response_time_hours: number | null;
+  is_accepting_clients: boolean;
+  stripe_connect_account_id: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface ProductTag {

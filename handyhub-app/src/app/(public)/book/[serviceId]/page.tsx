@@ -50,14 +50,14 @@ export default function BookingPage({ params }: BookingPageProps) {
       {/* Back link */}
       <div className="mb-6">
         <Link href={`/designers/${designer.id}`} className="flex items-center gap-1 text-sm text-slate-500 transition-colors hover:text-primary">
-          <ArrowLeft className="size-4" /> Back to {designer.name}&apos;s Profile
+          <ArrowLeft className="size-4" /> Back to {designer.display_name}&apos;s Profile
         </Link>
       </div>
 
       {/* Header */}
       <div className="mb-8">
         <h1 className="mb-2 text-3xl font-bold text-slate-900">Complete Your Booking</h1>
-        <p className="text-slate-500">Provide details for your project to get started with {designer.name}.</p>
+        <p className="text-slate-500">Provide details for your project to get started with {designer.display_name}.</p>
       </div>
 
       <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
@@ -194,7 +194,7 @@ export default function BookingPage({ params }: BookingPageProps) {
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder={`Is there anything specific you want ${designer.name.split(" ")[0]} to know about your routine or needs?`}
+                  placeholder={`Is there anything specific you want ${designer.display_name.split(" ")[0]} to know about your routine or needs?`}
                   rows={4}
                   className="w-full resize-none rounded-xl border border-slate-200 bg-white p-4 text-sm shadow-sm focus:border-primary focus:ring-primary"
                 />
@@ -222,8 +222,8 @@ export default function BookingPage({ params }: BookingPageProps) {
                 <div className="mb-6 flex items-center gap-3 border-b pb-6">
                   <div className="relative">
                     <Image
-                      src={designer.avatar_url}
-                      alt={designer.name}
+                      src={designer.avatar_url ?? ""}
+                      alt={designer.display_name}
                       width={56}
                       height={56}
                       className="size-14 rounded-full border-2 border-white object-cover shadow-sm"
@@ -233,7 +233,7 @@ export default function BookingPage({ params }: BookingPageProps) {
                     </div>
                   </div>
                   <div>
-                    <h3 className="font-bold text-slate-900">{designer.name}</h3>
+                    <h3 className="font-bold text-slate-900">{designer.display_name}</h3>
                     <div className="flex items-center gap-1 text-xs text-slate-500">
                       <span className="flex items-center gap-0.5 font-bold text-yellow-500">
                         <Star className="size-3.5 fill-yellow-500" /> {designer.rating_avg}
@@ -302,7 +302,7 @@ export default function BookingPage({ params }: BookingPageProps) {
             <div className="rounded-xl border border-dashed border-slate-200 p-4 text-center">
               <p className="mb-2 text-xs text-slate-500">Questions about this service?</p>
               <Link href={`/designers/${designer.id}`} className="flex items-center justify-center gap-1 text-xs font-bold text-primary hover:underline">
-                <MessageSquare className="size-3.5" /> Message {designer.name.split(" ")[0]}
+                <MessageSquare className="size-3.5" /> Message {designer.display_name.split(" ")[0]}
               </Link>
             </div>
           </div>

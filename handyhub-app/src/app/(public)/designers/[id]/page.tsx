@@ -46,10 +46,10 @@ export default function DesignerProfilePage({ params }: DesignerProfilePageProps
   ];
 
   const stats = [
-    { value: designer.design_count.toString(), label: "Designs" },
+    { value: designer.total_ideas_posted.toString(), label: "Designs" },
     { value: designer.total_likes >= 1000 ? `${(designer.total_likes / 1000).toFixed(1)}K` : designer.total_likes.toString(), label: "Likes" },
     { value: `\u2605 ${designer.rating_avg}`, label: `${designer.review_count} reviews` },
-    { value: `${designer.years_on_platform} ${designer.years_on_platform === 1 ? "yr" : "yrs"}`, label: "on HandyHub" },
+    { value: `${designer.years_experience} ${designer.years_experience === 1 ? "yr" : "yrs"}`, label: "Experience" },
   ];
 
   return (
@@ -57,8 +57,8 @@ export default function DesignerProfilePage({ params }: DesignerProfilePageProps
       {/* Cover photo */}
       <div className="relative h-[180px] sm:h-[280px] w-full overflow-hidden bg-slate-300">
         <Image
-          src={designer.cover_url}
-          alt={`${designer.name} cover`}
+          src={designer.cover_photo_url ?? ""}
+          alt={`${designer.display_name} cover`}
           fill
           className="object-cover"
           priority
@@ -67,7 +67,7 @@ export default function DesignerProfilePage({ params }: DesignerProfilePageProps
 
         {/* Action buttons on cover */}
         <div className="absolute bottom-4 right-4 hidden gap-2 sm:flex">
-          <Button className="shadow-lg">Hire {designer.name.split(" ")[0]} &rarr;</Button>
+          <Button className="shadow-lg">Hire {designer.display_name.split(" ")[0]} &rarr;</Button>
           <Button variant="outline" className="border-white bg-white/90 shadow-lg">
             <MessageSquare className="mr-1.5 size-4" /> Message
           </Button>
@@ -80,8 +80,8 @@ export default function DesignerProfilePage({ params }: DesignerProfilePageProps
           {/* Avatar */}
           <div className="-mt-10 mb-4 flex justify-center sm:-mt-12 sm:justify-start">
             <Image
-              src={designer.avatar_url}
-              alt={designer.name}
+              src={designer.avatar_url ?? ""}
+              alt={designer.display_name}
               width={96}
               height={96}
               className="size-[72px] rounded-full border-[3px] border-white object-cover shadow-md sm:size-24 sm:border-4"
@@ -91,18 +91,18 @@ export default function DesignerProfilePage({ params }: DesignerProfilePageProps
           {/* Name + badge */}
           <div className="text-center sm:text-left">
             <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
-              <h1 className="text-2xl font-bold text-slate-800">{designer.name}</h1>
-              <DesignerBadge tier={designer.tier} size="md" />
+              <h1 className="text-2xl font-bold text-slate-800">{designer.display_name}</h1>
+              <DesignerBadge tier={designer.designer_tier} size="md" />
             </div>
             <p className="mt-1 text-sm text-slate-500">
-              <MapPin className="mr-0.5 inline size-3.5" /> {designer.location}
-              {designer.accepts_remote && <span className="ml-1 text-primary"> &middot; Accepts remote clients \u2713</span>}
+              <MapPin className="mr-0.5 inline size-3.5" /> {[designer.location_city, designer.location_state].filter(Boolean).join(", ")}
+              {designer.accepts_remote_clients && <span className="ml-1 text-primary"> &middot; Accepts remote clients \u2713</span>}
             </p>
           </div>
 
           {/* Mobile action buttons */}
           <div className="mt-4 flex gap-2 sm:hidden">
-            <Button className="flex-1">Hire {designer.name.split(" ")[0]} &rarr;</Button>
+            <Button className="flex-1">Hire {designer.display_name.split(" ")[0]} &rarr;</Button>
             <Button variant="outline" className="flex-1">
               <MessageSquare className="mr-1.5 size-4" /> Message
             </Button>
@@ -112,13 +112,23 @@ export default function DesignerProfilePage({ params }: DesignerProfilePageProps
           <p className="mt-4 text-sm leading-relaxed text-slate-600 sm:max-w-xl">{designer.bio}</p>
 
           {/* Social */}
-          {designer.social_links.length > 0 && (
+          {(designer.instagram_handle || designer.tiktok_handle || designer.pinterest_handle) && (
             <div className="mt-3 flex gap-3">
-              {designer.social_links.map((link) => (
-                <a key={link.platform} href={link.url} className="text-slate-400 hover:text-slate-600">
+              {designer.instagram_handle && (
+                <a href={`https://instagram.com/${designer.instagram_handle}`} className="text-slate-400 hover:text-slate-600">
                   <Instagram className="size-4" />
                 </a>
-              ))}
+              )}
+              {designer.tiktok_handle && (
+                <a href={`https://tiktok.com/@${designer.tiktok_handle}`} className="text-slate-400 hover:text-slate-600">
+                  <Instagram className="size-4" />
+                </a>
+              )}
+              {designer.pinterest_handle && (
+                <a href={`https://pinterest.com/${designer.pinterest_handle}`} className="text-slate-400 hover:text-slate-600">
+                  <Instagram className="size-4" />
+                </a>
+              )}
             </div>
           )}
 
@@ -136,8 +146,8 @@ export default function DesignerProfilePage({ params }: DesignerProfilePageProps
             ))}
           </div>
 
-          {designer.credentials && (
-            <p className="mt-2 text-xs text-slate-500">\uD83C\uDF93 {designer.credentials}</p>
+          {designer.credentials.length > 0 && (
+            <p className="mt-2 text-xs text-slate-500">\uD83C\uDF93 {designer.credentials.join(" \u00b7 ")}</p>
           )}
         </div>
       </div>
@@ -196,7 +206,7 @@ export default function DesignerProfilePage({ params }: DesignerProfilePageProps
                 </div>
                 {designs.length > filteredDesigns.length && (
                   <p className="text-center text-sm font-medium text-primary">
-                    View All ({designer.design_count}) &rarr;
+                    View All ({designer.total_ideas_posted}) &rarr;
                   </p>
                 )}
               </div>
@@ -285,13 +295,13 @@ export default function DesignerProfilePage({ params }: DesignerProfilePageProps
                       <div className="ml-10 rounded-lg bg-slate-50 p-3">
                         <div className="mb-1 flex items-center gap-1.5">
                           <Image
-                            src={designer.avatar_url}
-                            alt={designer.name}
+                            src={designer.avatar_url ?? ""}
+                            alt={designer.display_name}
                             width={20}
                             height={20}
                             className="size-5 rounded-full object-cover"
                           />
-                          <span className="text-xs font-medium text-slate-700">{designer.name}</span>
+                          <span className="text-xs font-medium text-slate-700">{designer.display_name}</span>
                         </div>
                         <p className="text-sm text-slate-600">{review.designer_reply}</p>
                       </div>
@@ -306,7 +316,7 @@ export default function DesignerProfilePage({ params }: DesignerProfilePageProps
           <div className="hidden lg:block">
             <Card className="sticky top-16 border-t-[3px] border-t-primary shadow-md">
               <CardContent className="space-y-3 p-5">
-                <h3 className="font-semibold text-slate-800">Work with {designer.name.split(" ")[0]}</h3>
+                <h3 className="font-semibold text-slate-800">Work with {designer.display_name.split(" ")[0]}</h3>
                 <div>
                   <span className="text-xs text-slate-400">Starting from</span>
                   <p className="text-2xl font-bold text-primary">${Math.min(...services.map((s) => s.price))}</p>

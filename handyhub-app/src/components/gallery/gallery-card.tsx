@@ -72,14 +72,14 @@ export function GalleryCard({ design, className }: GalleryCardProps) {
           {/* Designer row */}
           <div className="flex items-center gap-1.5">
             <Image
-              src={design.designer.avatar_url}
-              alt={design.designer.name}
+              src={design.designer.avatar_url ?? ""}
+              alt={design.designer.display_name}
               width={20}
               height={20}
               className="size-5 rounded-full object-cover"
             />
-            <span className="truncate text-xs text-slate-600">{design.designer.name}</span>
-            <DesignerBadge tier={design.designer.tier} size="sm" />
+            <span className="truncate text-xs text-slate-600">{design.designer.display_name}</span>
+            <DesignerBadge tier={design.designer.designer_tier} size="sm" />
           </div>
 
           {/* Title + budget */}

@@ -90,16 +90,16 @@ export default function DesignDetailPage({ params }: DesignDetailPageProps) {
         <div className="mx-auto flex max-w-6xl items-center justify-between">
           <Link href={`/designers/${design.designer.id}`} className="flex items-center gap-3">
             <Image
-              src={design.designer.avatar_url}
-              alt={design.designer.name}
+              src={design.designer.avatar_url ?? ""}
+              alt={design.designer.display_name}
               width={48}
               height={48}
               className="size-12 rounded-full object-cover"
             />
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-slate-800">{design.designer.name}</span>
-                <DesignerBadge tier={design.designer.tier} size="md" />
+                <span className="font-semibold text-slate-800">{design.designer.display_name}</span>
+                <DesignerBadge tier={design.designer.designer_tier} size="md" />
               </div>
               <p className="text-sm text-slate-500">
                 <Star className="mr-0.5 inline size-3.5 fill-amber-500 text-amber-500" />
@@ -110,7 +110,7 @@ export default function DesignDetailPage({ params }: DesignDetailPageProps) {
           <div className="hidden gap-2 sm:flex">
             <Button variant="outline">Follow</Button>
             <Link href={`/designers/${design.designer.id}`}>
-              <Button>Hire {design.designer.name.split(" ")[0]} &rarr;</Button>
+              <Button>Hire {design.designer.display_name.split(" ")[0]} &rarr;</Button>
             </Link>
           </div>
         </div>
@@ -214,7 +214,7 @@ export default function DesignDetailPage({ params }: DesignDetailPageProps) {
       {services.length > 0 && (
         <div className="bg-slate-50 px-4 py-10 sm:px-8">
           <div className="mx-auto max-w-6xl">
-            <h2 className="mb-6 text-xl font-bold text-slate-800">Work with {design.designer.name}</h2>
+            <h2 className="mb-6 text-xl font-bold text-slate-800">Work with {design.designer.display_name}</h2>
             <div className="flex gap-4 overflow-x-auto pb-2">
               {services.slice(0, 3).map((service) => (
                 <Card key={service.id} className="min-w-[260px] shrink-0">
