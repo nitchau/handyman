@@ -253,11 +253,11 @@ export default function BookingPage({ params }: BookingPageProps) {
                   <div className="flex gap-4">
                     <div>
                       <p className="mb-1 text-xs font-bold uppercase tracking-wider text-slate-400">Delivery</p>
-                      <p className="text-sm text-slate-700">{service.delivery_days}</p>
+                      <p className="text-sm text-slate-700">{service.estimated_delivery_days === 0 ? "Same day" : `${service.estimated_delivery_days} day${service.estimated_delivery_days > 1 ? "s" : ""}`}</p>
                     </div>
                     <div>
                       <p className="mb-1 text-xs font-bold uppercase tracking-wider text-slate-400">Revisions</p>
-                      <p className="text-sm text-slate-700">{service.revisions > 0 ? `${service.revisions} Included` : "None"}</p>
+                      <p className="text-sm text-slate-700">{service.max_revisions > 0 ? `${service.max_revisions} Included` : "None"}</p>
                     </div>
                   </div>
                 </div>

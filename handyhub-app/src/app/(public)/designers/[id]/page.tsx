@@ -221,8 +221,8 @@ export default function DesignerProfilePage({ params }: DesignerProfilePageProps
                       <h3 className="font-semibold text-slate-800">{service.title}</h3>
                       <p className="text-sm text-slate-500 line-clamp-3">{service.description}</p>
                       <div className="text-xs text-slate-400">
-                        \uD83D\uDCE6 {service.delivery_days}
-                        {service.revisions > 0 && <span> &middot; \uD83D\uDD04 {service.revisions} revision{service.revisions > 1 ? "s" : ""}</span>}
+                        \uD83D\uDCE6 {service.estimated_delivery_days === 0 ? "Same day" : `${service.estimated_delivery_days} day${service.estimated_delivery_days > 1 ? "s" : ""}`}
+                        {service.max_revisions > 0 && <span> &middot; \uD83D\uDD04 {service.max_revisions} revision{service.max_revisions > 1 ? "s" : ""}</span>}
                       </div>
                       <p className="text-xl font-bold text-primary">${service.price}</p>
                       <Link href={`/book/${service.id}`}>

@@ -418,14 +418,42 @@ export interface DesignIdeaSave {
   created_at: string;
 }
 
+export enum ServiceType {
+  MOOD_BOARD = "mood_board",
+  ROOM_DESIGN = "room_design",
+  CONSULTATION = "consultation",
+  SHOPPING_LIST = "shopping_list",
+  COLOR_CONSULTATION = "color_consultation",
+  SPACE_PLANNING = "space_planning",
+  FULL_ROOM_REDESIGN = "full_room_redesign",
+  STYLING_SESSION = "styling_session",
+  CUSTOM = "custom",
+}
+
+export enum PriceType {
+  FIXED = "fixed",
+  HOURLY = "hourly",
+  PER_ROOM = "per_room",
+  CUSTOM_QUOTE = "custom_quote",
+}
+
 export interface DesignService {
   id: string;
   designer_id: string;
+  service_type: ServiceType;
   title: string;
   description: string;
-  delivery_days: string;
-  revisions: number;
   price: number;
+  price_type: PriceType;
+  estimated_delivery_days: number;
+  max_revisions: number;
+  is_virtual: boolean;
+  includes_shopping_list: boolean;
+  includes_bom: boolean;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface DesignReview {
