@@ -11,6 +11,7 @@ import { DesignerBadge, GalleryCard, ProductTagDot } from "@/components/gallery"
 import { Difficulty, type DesignIdea, type DesignService } from "@/types/database";
 import { cn } from "@/lib/utils";
 import { Star } from "lucide-react";
+import { useTranslation } from "@/lib/i18n/language-context";
 
 const BLUR_PLACEHOLDER =
   "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAEAAQDASIAAhEBAxEB/8QAFAABAAAAAAAAAAAAAAAAAAAABv/EABQQAQAAAAAAAAAAAAAAAAAAAAD/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8AkAB//9k=";
@@ -30,6 +31,7 @@ function formatLabel(val: string): string {
 }
 
 export default function DesignDetailPage({ params }: DesignDetailPageProps) {
+  const { t } = useTranslation();
   const [design, setDesign] = useState<DesignIdea | null>(null);
   const [services, setServices] = useState<DesignService[]>([]);
   const [relatedDesigns, setRelatedDesigns] = useState<DesignIdea[]>([]);
@@ -127,7 +129,7 @@ export default function DesignDetailPage({ params }: DesignDetailPageProps) {
             <Heart className="size-4" /> {design.like_count.toLocaleString()}
           </button>
           <button className="flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm">
-            <Bookmark className="size-4" /> Save
+            <Bookmark className="size-4" /> {t("designDetail.save")}
           </button>
           <button className="flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm">
             <Share2 className="size-4" />
@@ -153,14 +155,14 @@ export default function DesignDetailPage({ params }: DesignDetailPageProps) {
               </div>
               <p className="text-sm text-slate-500">
                 <Star className="mr-0.5 inline size-3.5 fill-amber-500 text-amber-500" />
-                {design.designer?.rating_avg} ({design.designer?.review_count} reviews) &middot; {formatLabel(design.style)} &middot; {formatLabel(design.room_type)} Specialist
+                {design.designer?.rating_avg} ({design.designer?.review_count} {t("contractors.reviews")}) &middot; {formatLabel(design.style)} &middot; {formatLabel(design.room_type)} {t("designDetail.specialist")}
               </p>
             </div>
           </Link>
           <div className="hidden gap-2 sm:flex">
-            <Button variant="outline">Follow</Button>
+            <Button variant="outline">{t("designDetail.follow")}</Button>
             <Link href={`/designers/${design.designer?.id}`}>
-              <Button>Hire {design.designer?.display_name?.split(" ")[0]} &rarr;</Button>
+              <Button>{t("designDetail.hire")} {design.designer?.display_name?.split(" ")[0]} &rarr;</Button>
             </Link>
           </div>
         </div>
@@ -178,7 +180,7 @@ export default function DesignDetailPage({ params }: DesignDetailPageProps) {
               <Badge variant="secondary" className="bg-emerald-100 text-emerald-700">{formatLabel(design.room_type)}</Badge>
               <Badge variant="secondary" className="bg-emerald-100 text-emerald-700">{formatLabel(design.style)}</Badge>
               <Badge variant="secondary" className={difficultyStyles[design.difficulty_level]}>{"\uD83D\uDCD0"} {formatLabel(design.difficulty_level)}</Badge>
-              {design.is_diy_friendly && <Badge variant="secondary" className="bg-green-100 text-green-700">{"\u2713"} DIY Friendly</Badge>}
+              {design.is_diy_friendly && <Badge variant="secondary" className="bg-green-100 text-green-700">{"\u2713"} {t("designDetail.diyFriendly")}</Badge>}
               {design.estimated_cost != null && <Badge variant="secondary" className="bg-slate-100 text-slate-700">{"\uD83D\uDCB0"} ~${design.estimated_cost.toLocaleString()}</Badge>}
             </div>
 
@@ -204,7 +206,7 @@ export default function DesignDetailPage({ params }: DesignDetailPageProps) {
             <Card className="sticky top-24 border-l-4 border-l-primary shadow-md">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg">
-                  <ShoppingCart className="size-5" /> Products Used ({design.product_tags.length} items)
+                  <ShoppingCart className="size-5" /> {t("designDetail.productsUsed")} ({design.product_tags.length} {t("designDetail.items")})
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-0">
@@ -229,27 +231,27 @@ export default function DesignDetailPage({ params }: DesignDetailPageProps) {
                         </div>
                         <div className="text-right">
                           <p className="text-sm font-semibold text-primary">${tag.estimated_price.toFixed(2)}</p>
-                          {tag.product_url && <a href={tag.product_url} className="text-xs font-medium text-primary hover:underline">Buy &rarr;</a>}
+                          {tag.product_url && <a href={tag.product_url} className="text-xs font-medium text-primary hover:underline">{t("designDetail.buy")} &rarr;</a>}
                         </div>
                       </div>
                     ))}
                     <div className="border-t pt-4 space-y-3">
                       <div className="flex items-baseline justify-between">
-                        <span className="font-semibold text-slate-800">Estimated Total</span>
+                        <span className="font-semibold text-slate-800">{t("designDetail.estimatedTotal")}</span>
                         <span className="text-lg font-bold text-primary">~${design.estimated_cost?.toLocaleString()}</span>
                       </div>
-                      <p className="text-xs text-slate-400">Prices compared across 4 retailers</p>
+                      <p className="text-xs text-slate-400">{t("designDetail.priceCompare")}</p>
                       <Button className="w-full">
-                        <ShoppingCart className="mr-2 size-4" /> Shop All Items
+                        <ShoppingCart className="mr-2 size-4" /> {t("designDetail.shopAll")}
                       </Button>
                       <Button variant="outline" className="w-full">
-                        Generate Full Material List &rarr;
+                        {t("designDetail.generateList")} &rarr;
                       </Button>
                     </div>
                   </>
                 ) : (
                   <p className="py-4 text-center text-sm text-slate-400">
-                    Product tags coming soon for this design.
+                    {t("designDetail.noProducts")}
                   </p>
                 )}
               </CardContent>
@@ -262,7 +264,7 @@ export default function DesignDetailPage({ params }: DesignDetailPageProps) {
       {services.length > 0 && (
         <div className="bg-slate-50 px-4 py-10 sm:px-8">
           <div className="mx-auto max-w-6xl">
-            <h2 className="mb-6 text-xl font-bold text-slate-800">Work with {design.designer?.display_name}</h2>
+            <h2 className="mb-6 text-xl font-bold text-slate-800">{t("designDetail.workWith")} {design.designer?.display_name}</h2>
             <div className="flex gap-4 overflow-x-auto pb-2">
               {services.slice(0, 3).map((service) => (
                 <Card key={service.id} className="min-w-[260px] shrink-0">
@@ -270,10 +272,10 @@ export default function DesignDetailPage({ params }: DesignDetailPageProps) {
                     <h3 className="font-semibold text-slate-800">{service.title}</h3>
                     <p className="text-sm text-slate-500 line-clamp-2">{service.description}</p>
                     <p className="text-xs text-slate-400">
-                      {"\uD83D\uDCE6"} {service.estimated_delivery_days === 0 ? "Same day" : `${service.estimated_delivery_days} day${service.estimated_delivery_days > 1 ? "s" : ""}`} {service.max_revisions > 0 && `\u00b7 \uD83D\uDD04 ${service.max_revisions} revision${service.max_revisions > 1 ? "s" : ""}`}
+                      {"\uD83D\uDCE6"} {service.estimated_delivery_days === 0 ? t("designDetail.sameDay") : `${service.estimated_delivery_days} ${service.estimated_delivery_days > 1 ? t("designDetail.days") : t("designDetail.day")}`} {service.max_revisions > 0 && `\u00b7 \uD83D\uDD04 ${service.max_revisions} ${service.max_revisions > 1 ? t("designDetail.revisions") : t("designDetail.revision")}`}
                     </p>
                     <p className="text-xl font-bold text-primary">${service.price}</p>
-                    <Button size="sm" className="w-full">Book Now</Button>
+                    <Button size="sm" className="w-full">{t("designDetail.bookNow")}</Button>
                   </CardContent>
                 </Card>
               ))}
@@ -287,9 +289,9 @@ export default function DesignDetailPage({ params }: DesignDetailPageProps) {
         <div className="px-4 py-10 sm:px-8">
           <div className="mx-auto max-w-6xl">
             <div className="mb-6 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-slate-800">Similar Designs You Might Love</h2>
+              <h2 className="text-xl font-bold text-slate-800">{t("designDetail.similarDesigns")}</h2>
               <Link href="/designs" className="text-sm font-medium text-primary hover:underline">
-                View All {formatLabel(design.room_type)} Designs &rarr;
+                {t("designDetail.viewAllDesigns")} {formatLabel(design.room_type)} &rarr;
               </Link>
             </div>
             <div className="flex gap-4 overflow-x-auto pb-2">

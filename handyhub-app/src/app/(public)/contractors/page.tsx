@@ -8,24 +8,41 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { contractors } from "@/data/contractor-data";
-
-const SERVICE_OPTIONS = ["All Services", "Plumbing", "Electrical", "Painting", "Carpentry", "General Handyman", "HVAC", "Roofing"];
-
-const FILTER_CHIPS = [
-  { id: "rating", label: "Rating 4+", active: true },
-  { id: "price", label: "Price $$-$$$", active: false },
-  { id: "availability", label: "Availability: Today", active: false },
-  { id: "verified", label: "Verified Pro Only", active: false },
-];
-
-const SORT_OPTIONS = ["Recommended", "Highest Rated", "Most Reviews", "Lowest Price"];
+import { useTranslation } from "@/lib/i18n/language-context";
 
 export default function ContractorSearchPage() {
+  const { t } = useTranslation();
   const [locationQuery, setLocationQuery] = useState("San Francisco, CA");
-  const [serviceCategory, setServiceCategory] = useState("All Services");
-  const [sortBy, setSortBy] = useState("Recommended");
-  const [filters, setFilters] = useState(FILTER_CHIPS);
+  const [serviceCategory, setServiceCategory] = useState("all");
+  const [sortBy, setSortBy] = useState("recommended");
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
+
+  const SERVICE_OPTIONS = [
+    { value: "all", label: t("contractors.allServices") },
+    { value: "plumbing", label: t("contractors.plumbing") },
+    { value: "electrical", label: t("contractors.electrical") },
+    { value: "painting", label: t("contractors.painting") },
+    { value: "carpentry", label: t("contractors.carpentry") },
+    { value: "handyman", label: t("contractors.generalHandyman") },
+    { value: "hvac", label: t("contractors.hvac") },
+    { value: "roofing", label: t("contractors.roofing") },
+  ];
+
+  const FILTER_CHIPS_INITIAL = [
+    { id: "rating", label: t("contractors.filterRating"), active: true },
+    { id: "price", label: t("contractors.filterPrice"), active: false },
+    { id: "availability", label: t("contractors.filterAvailability"), active: false },
+    { id: "verified", label: t("contractors.filterVerified"), active: false },
+  ];
+
+  const SORT_OPTIONS = [
+    { value: "recommended", label: t("contractors.sortRecommended") },
+    { value: "highest_rated", label: t("contractors.sortHighestRated") },
+    { value: "most_reviews", label: t("contractors.sortMostReviews") },
+    { value: "lowest_price", label: t("contractors.sortLowestPrice") },
+  ];
+
+  const [filters, setFilters] = useState(FILTER_CHIPS_INITIAL);
 
   const toggleFilter = (id: string) => {
     setFilters(filters.map((f) => (f.id === id ? { ...f, active: !f.active } : f)));
@@ -52,7 +69,7 @@ export default function ContractorSearchPage() {
               value={locationQuery}
               onChange={(e) => setLocationQuery(e.target.value)}
               className="flex-1 bg-transparent text-sm font-medium text-slate-900 outline-none placeholder:text-slate-400"
-              placeholder="Location..."
+              placeholder={t("contractors.locationPlaceholder")}
             />
           </div>
           <div className="flex flex-1 items-center gap-2 rounded-xl border bg-slate-50 px-3 py-2">
@@ -63,12 +80,12 @@ export default function ContractorSearchPage() {
               className="flex-1 cursor-pointer bg-transparent text-sm font-medium text-slate-900 outline-none"
             >
               {SERVICE_OPTIONS.map((s) => (
-                <option key={s}>{s}</option>
+                <option key={s.value} value={s.value}>{s.label}</option>
               ))}
             </select>
           </div>
           <Button className="gap-2 shadow-sm">
-            <Search className="size-4" /> Search
+            <Search className="size-4" /> {t("contractors.search")}
           </Button>
         </div>
       </div>
@@ -92,7 +109,7 @@ export default function ContractorSearchPage() {
             </button>
           ))}
           <div className="mx-1 h-6 w-px bg-slate-200" />
-          <button className="text-sm font-medium text-slate-500 hover:text-slate-800">Reset all</button>
+          <button className="text-sm font-medium text-slate-500 hover:text-slate-800">{t("contractors.resetAll")}</button>
         </div>
       </div>
 
@@ -104,17 +121,17 @@ export default function ContractorSearchPage() {
             {/* Results header */}
             <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <h1 className="text-xl font-bold text-slate-900">
-                {contractors.length} contractors near {locationQuery}
+                {contractors.length} {t("contractors.contractorsNear")} {locationQuery}
               </h1>
               <div className="flex items-center gap-2">
-                <span className="text-sm text-slate-500">Sort by:</span>
+                <span className="text-sm text-slate-500">{t("contractors.sortBy")}</span>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
                   className="cursor-pointer rounded-lg border border-slate-200 bg-white py-2 pl-3 pr-8 text-sm font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-primary"
                 >
                   {SORT_OPTIONS.map((s) => (
-                    <option key={s}>{s}</option>
+                    <option key={s.value} value={s.value}>{s.label}</option>
                   ))}
                 </select>
               </div>
@@ -137,7 +154,7 @@ export default function ContractorSearchPage() {
                         />
                         {c.verified && (
                           <div className="absolute -bottom-1 -right-1 flex size-5 items-center justify-center rounded-full bg-primary text-[10px] text-white">
-                            \u2713
+                            {"\u2713"}
                           </div>
                         )}
                       </div>
@@ -149,7 +166,7 @@ export default function ContractorSearchPage() {
                             <div className="mt-0.5 flex items-center gap-1 text-sm">
                               <Star className="size-4 fill-yellow-400 text-yellow-400" />
                               <span className="font-semibold text-slate-900">{c.rating_avg}</span>
-                              <span className="text-slate-500">({c.review_count} reviews)</span>
+                              <span className="text-slate-500">({c.review_count} {t("contractors.reviews")})</span>
                             </div>
                           </div>
                           <button onClick={() => toggleFavorite(c.id)} className="text-slate-400 transition-colors hover:text-primary">
@@ -175,19 +192,19 @@ export default function ContractorSearchPage() {
                     {/* Footer */}
                     <div className="flex items-center justify-between border-t pt-4">
                       <div>
-                        <p className="text-xs text-slate-500">Starting from</p>
+                        <p className="text-xs text-slate-500">{t("contractors.startingFrom")}</p>
                         <p className="text-lg font-bold text-primary">
                           ${c.hourly_rate}
-                          <span className="text-sm font-normal text-slate-500">/hr</span>
+                          <span className="text-sm font-normal text-slate-500">{t("contractors.perHour")}</span>
                         </p>
                       </div>
                       <div className="flex gap-2">
                         <Link href={`/contractors/${c.id}`}>
                           <Button variant="outline" size="sm">
-                            View Profile
+                            {t("contractors.viewProfile")}
                           </Button>
                         </Link>
-                        <Button size="sm">Request Quote</Button>
+                        <Button size="sm">{t("contractors.requestQuote")}</Button>
                       </div>
                     </div>
                   </CardContent>
@@ -198,7 +215,7 @@ export default function ContractorSearchPage() {
             {/* Load more */}
             <div className="mb-12 mt-8 flex justify-center">
               <Button variant="outline" size="lg">
-                Load More Pros
+                {t("contractors.loadMore")}
               </Button>
             </div>
           </div>
@@ -210,7 +227,7 @@ export default function ContractorSearchPage() {
             <div className="rounded-lg bg-white px-4 py-2 shadow-xl">
               <div className="flex items-center gap-2">
                 <MapPin className="size-4 text-primary" />
-                <span className="text-sm font-bold">Map view coming soon</span>
+                <span className="text-sm font-bold">{t("contractors.mapComingSoon")}</span>
               </div>
             </div>
             {/* Map markers placeholder */}

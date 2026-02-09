@@ -10,6 +10,7 @@ import { DesignerBadge, FilterChipBar, GalleryCard } from "@/components/gallery"
 import { designerReviews } from "@/data/gallery-data";
 import type { DesignerProfile, DesignIdea, DesignService } from "@/types/database";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/language-context";
 
 interface DesignerProfilePageProps {
   readonly params: Promise<{ id: string }>;
@@ -20,6 +21,7 @@ function formatLabel(val: string): string {
 }
 
 export default function DesignerProfilePage({ params }: DesignerProfilePageProps) {
+  const { t } = useTranslation();
   const [designer, setDesigner] = useState<DesignerProfile | null>(null);
   const [designs, setDesigns] = useState<DesignIdea[]>([]);
   const [services, setServices] = useState<DesignService[]>([]);
@@ -64,7 +66,7 @@ export default function DesignerProfilePage({ params }: DesignerProfilePageProps
   );
 
   const roomFilterOptions = [
-    { value: "all", label: "All" },
+    { value: "all", label: t("tools.all") },
     ...designer.room_types.map((rt) => ({ value: rt, label: formatLabel(rt) })),
   ];
 
@@ -76,11 +78,17 @@ export default function DesignerProfilePage({ params }: DesignerProfilePageProps
     { stars: 1, count: 0 },
   ];
 
+  const tabLabels: Record<string, string> = {
+    portfolio: t("designerProfile.portfolio"),
+    services: t("designerProfile.services"),
+    reviews: t("designerProfile.reviews"),
+  };
+
   const stats = [
-    { value: designer.total_ideas_posted.toString(), label: "Designs" },
-    { value: designer.total_likes >= 1000 ? `${(designer.total_likes / 1000).toFixed(1)}K` : designer.total_likes.toString(), label: "Likes" },
-    { value: `\u2605 ${designer.rating_avg}`, label: `${designer.review_count} reviews` },
-    { value: `${designer.years_experience} ${designer.years_experience === 1 ? "yr" : "yrs"}`, label: "Experience" },
+    { value: designer.total_ideas_posted.toString(), label: t("designerProfile.designs") },
+    { value: designer.total_likes >= 1000 ? `${(designer.total_likes / 1000).toFixed(1)}K` : designer.total_likes.toString(), label: t("designerProfile.likes") },
+    { value: `\u2605 ${designer.rating_avg}`, label: `${designer.review_count} ${t("designerProfile.reviews").toLowerCase()}` },
+    { value: `${designer.years_experience} ${designer.years_experience === 1 ? "yr" : "yrs"}`, label: t("designerProfile.experience") },
   ];
 
   return (
@@ -98,9 +106,9 @@ export default function DesignerProfilePage({ params }: DesignerProfilePageProps
 
         {/* Action buttons on cover */}
         <div className="absolute bottom-4 right-4 hidden gap-2 sm:flex">
-          <Button className="shadow-lg">Hire {designer.display_name.split(" ")[0]} &rarr;</Button>
+          <Button className="shadow-lg">{t("designerProfile.hire")} {designer.display_name.split(" ")[0]} &rarr;</Button>
           <Button variant="outline" className="border-white bg-white/90 shadow-lg">
-            <MessageSquare className="mr-1.5 size-4" /> Message
+            <MessageSquare className="mr-1.5 size-4" /> {t("designerProfile.message")}
           </Button>
         </div>
       </div>
@@ -127,15 +135,15 @@ export default function DesignerProfilePage({ params }: DesignerProfilePageProps
             </div>
             <p className="mt-1 text-sm text-slate-500">
               <MapPin className="mr-0.5 inline size-3.5" /> {[designer.location_city, designer.location_state].filter(Boolean).join(", ")}
-              {designer.accepts_remote_clients && <span className="ml-1 text-primary"> &middot; Accepts remote clients &#10003;</span>}
+              {designer.accepts_remote_clients && <span className="ml-1 text-primary"> &middot; {t("designerProfile.acceptsRemote")} &#10003;</span>}
             </p>
           </div>
 
           {/* Mobile action buttons */}
           <div className="mt-4 flex gap-2 sm:hidden">
-            <Button className="flex-1">Hire {designer.display_name.split(" ")[0]} &rarr;</Button>
+            <Button className="flex-1">{t("designerProfile.hire")} {designer.display_name.split(" ")[0]} &rarr;</Button>
             <Button variant="outline" className="flex-1">
-              <MessageSquare className="mr-1.5 size-4" /> Message
+              <MessageSquare className="mr-1.5 size-4" /> {t("designerProfile.message")}
             </Button>
           </div>
 
@@ -209,7 +217,7 @@ export default function DesignerProfilePage({ params }: DesignerProfilePageProps
                   : "text-slate-500 hover:text-slate-700"
               )}
             >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              {tabLabels[tab]}
             </button>
           ))}
         </div>
@@ -237,12 +245,12 @@ export default function DesignerProfilePage({ params }: DesignerProfilePageProps
                 </div>
                 {filteredDesigns.length === 0 && (
                   <p className="py-8 text-center text-sm text-slate-400">
-                    No designs match this filter.
+                    {t("designerProfile.noDesigns")}
                   </p>
                 )}
                 {designs.length > 12 && (
                   <p className="text-center text-sm font-medium text-primary">
-                    View All ({designer.total_ideas_posted}) &rarr;
+                    {t("designerProfile.viewAll")} ({designer.total_ideas_posted}) &rarr;
                   </p>
                 )}
               </div>
@@ -257,12 +265,12 @@ export default function DesignerProfilePage({ params }: DesignerProfilePageProps
                       <h3 className="font-semibold text-slate-800">{service.title}</h3>
                       <p className="text-sm text-slate-500 line-clamp-3">{service.description}</p>
                       <div className="text-xs text-slate-400">
-                        {"\uD83D\uDCE6"} {service.estimated_delivery_days === 0 ? "Same day" : `${service.estimated_delivery_days} day${service.estimated_delivery_days > 1 ? "s" : ""}`}
-                        {service.max_revisions > 0 && <span> &middot; {"\uD83D\uDD04"} {service.max_revisions} revision{service.max_revisions > 1 ? "s" : ""}</span>}
+                        {"\uD83D\uDCE6"} {service.estimated_delivery_days === 0 ? t("designerProfile.sameDay") : `${service.estimated_delivery_days} ${service.estimated_delivery_days > 1 ? t("designerProfile.days") : t("designerProfile.day")}`}
+                        {service.max_revisions > 0 && <span> &middot; {"\uD83D\uDD04"} {service.max_revisions} {service.max_revisions > 1 ? t("designerProfile.revisions") : t("designerProfile.revision")}</span>}
                       </div>
                       <p className="text-xl font-bold text-primary">${service.price}</p>
                       <Link href={`/book/${service.id}`}>
-                        <Button className="w-full">Book This Service &rarr;</Button>
+                        <Button className="w-full">{t("designerProfile.bookService")} &rarr;</Button>
                       </Link>
                     </CardContent>
                   </Card>
@@ -284,7 +292,7 @@ export default function DesignerProfilePage({ params }: DesignerProfilePageProps
                             <Star key={s} className={cn("size-4", s <= Math.round(designer.rating_avg) ? "fill-primary text-primary" : "text-slate-200")} />
                           ))}
                         </div>
-                        <p className="mt-1 text-xs text-slate-500">{designer.review_count} reviews</p>
+                        <p className="mt-1 text-xs text-slate-500">{designer.review_count} {t("designerProfile.reviews").toLowerCase()}</p>
                       </div>
                       <div className="flex-1 space-y-1">
                         {ratingBreakdown.map((row) => (
@@ -352,20 +360,20 @@ export default function DesignerProfilePage({ params }: DesignerProfilePageProps
           <div className="hidden lg:block">
             <Card className="sticky top-16 border-t-[3px] border-t-primary shadow-md">
               <CardContent className="space-y-3 p-5">
-                <h3 className="font-semibold text-slate-800">Work with {designer.display_name.split(" ")[0]}</h3>
+                <h3 className="font-semibold text-slate-800">{t("designerProfile.workWith")} {designer.display_name.split(" ")[0]}</h3>
                 <div>
-                  <span className="text-xs text-slate-400">Starting from</span>
+                  <span className="text-xs text-slate-400">{t("designerProfile.startingFrom")}</span>
                   <p className="text-2xl font-bold text-primary">
                     ${services.length > 0 ? Math.min(...services.map((s) => s.price)) : "—"}
                   </p>
                 </div>
-                <Button className="w-full" onClick={() => setActiveTab("services")}>View Services &rarr;</Button>
+                <Button className="w-full" onClick={() => setActiveTab("services")}>{t("designerProfile.viewServices")} &rarr;</Button>
                 <hr />
                 <p className="flex items-center gap-1.5 text-xs text-slate-500">
-                  <Clock className="size-3.5" /> Response time: ~{designer.response_time_hours} hours
+                  <Clock className="size-3.5" /> {t("designerProfile.responseTime")} ~{designer.response_time_hours} {t("designerProfile.hours")}
                 </p>
                 <button className="text-sm font-medium text-primary hover:underline">
-                  <MessageSquare className="mr-1 inline size-3.5" /> Send Message
+                  <MessageSquare className="mr-1 inline size-3.5" /> {t("designerProfile.sendMessage")}
                 </button>
               </CardContent>
             </Card>

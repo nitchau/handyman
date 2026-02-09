@@ -13,10 +13,12 @@ import {
 import type { DesignIdea } from "@/types/database";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useTranslation } from "@/lib/i18n/language-context";
 
 const PAGE_SIZE = 12;
 
 export default function DesignsPage() {
+  const { t } = useTranslation();
   const [roomFilter, setRoomFilter] = useState("all");
   const [styleFilter, setStyleFilter] = useState("all");
   const [budget, setBudget] = useState("all");
@@ -100,14 +102,14 @@ export default function DesignsPage() {
       <div className="border-b bg-white px-4 py-6 sm:px-8">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-800">Design Ideas</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-800">{t("designs.title")}</h1>
             <p className="mt-1 text-sm text-slate-500">
-              Stunning room designs by professional and community designers
+              {t("designs.subtitle")}
             </p>
           </div>
           <Link href="/dashboard/upload">
             <Button variant="outline" className="hidden sm:flex">
-              Upload Your Design
+              {t("designs.uploadBtn")}
             </Button>
           </Link>
         </div>
@@ -147,7 +149,7 @@ export default function DesignsPage() {
                 />
                 <div className="h-5 w-9 rounded-full bg-slate-200 after:absolute after:left-[2px] after:top-[2px] after:size-4 after:rounded-full after:bg-white after:transition-all peer-checked:bg-primary peer-checked:after:translate-x-full" />
               </div>
-              DIY Friendly
+              {t("designs.diyFriendly")}
             </label>
 
             <select
@@ -175,7 +177,7 @@ export default function DesignsPage() {
 
         {designs.length === 0 && !isLoading && !initialLoad && (
           <div className="py-20 text-center text-slate-400">
-            No designs match your filters. Try adjusting your criteria.
+            {t("designs.noResults")}
           </div>
         )}
 
@@ -185,13 +187,13 @@ export default function DesignsPage() {
         {isLoading && (
           <div className="flex items-center justify-center gap-2 py-8 text-sm text-slate-400">
             <Loader2 className="size-4 animate-spin" />
-            Loading more designs...
+            {t("designs.loading")}
           </div>
         )}
 
         {!hasMore && designs.length > 0 && !isLoading && (
           <div className="py-8 text-center text-sm text-slate-400">
-            You&apos;ve seen all designs matching your filters.
+            {t("designs.endOfResults")}
           </div>
         )}
       </div>
