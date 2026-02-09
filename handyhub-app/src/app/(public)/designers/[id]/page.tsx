@@ -1,13 +1,14 @@
 "use client";
 
-import { use, useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Star, MapPin, Clock, MessageSquare, Instagram } from "lucide-react";
+import { Star, MapPin, Clock, MessageSquare, Instagram, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { DesignerBadge, FilterChipBar, GalleryCard } from "@/components/gallery";
-import { designers, designIdeas, designerServices, designerReviews } from "@/data/gallery-data";
+import { designerReviews } from "@/data/gallery-data";
+import type { DesignerProfile, DesignIdea, DesignService } from "@/types/database";
 import { cn } from "@/lib/utils";
 
 interface DesignerProfilePageProps {
@@ -19,14 +20,44 @@ function formatLabel(val: string): string {
 }
 
 export default function DesignerProfilePage({ params }: DesignerProfilePageProps) {
-  const { id } = use(params);
-  const designer = designers.find((d) => d.id === id) ?? designers[0];
-  const designs = designIdeas.filter((d) => d.designer_id === designer.id);
-  const services = designerServices.filter((s) => s.designer_id === designer.id);
-  const reviews = designerReviews;
+  const [designer, setDesigner] = useState<DesignerProfile | null>(null);
+  const [designs, setDesigns] = useState<DesignIdea[]>([]);
+  const [services, setServices] = useState<DesignService[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [activeTab, setActiveTab] = useState<"portfolio" | "services" | "reviews">("portfolio");
   const [portfolioFilter, setPortfolioFilter] = useState("all");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function load() {
+      const { id } = await params;
+
+      const res = await fetch(`/api/designers/${id}`);
+      if (!res.ok) return;
+      const { data } = await res.json();
+      if (cancelled) return;
+
+      setDesigner(data);
+      setDesigns(data.portfolio ?? []);
+      setServices(data.services ?? []);
+      setLoading(false);
+    }
+
+    load();
+    return () => { cancelled = true; };
+  }, [params]);
+
+  if (loading || !designer) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="size-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  const reviews = designerReviews;
 
   const filteredDesigns = designs.filter(
     (d) => portfolioFilter === "all" || d.room_type === portfolioFilter
@@ -96,7 +127,7 @@ export default function DesignerProfilePage({ params }: DesignerProfilePageProps
             </div>
             <p className="mt-1 text-sm text-slate-500">
               <MapPin className="mr-0.5 inline size-3.5" /> {[designer.location_city, designer.location_state].filter(Boolean).join(", ")}
-              {designer.accepts_remote_clients && <span className="ml-1 text-primary"> &middot; Accepts remote clients \u2713</span>}
+              {designer.accepts_remote_clients && <span className="ml-1 text-primary"> &middot; Accepts remote clients &#10003;</span>}
             </p>
           </div>
 
@@ -147,7 +178,7 @@ export default function DesignerProfilePage({ params }: DesignerProfilePageProps
           </div>
 
           {designer.credentials.length > 0 && (
-            <p className="mt-2 text-xs text-slate-500">\uD83C\uDF93 {designer.credentials.join(" \u00b7 ")}</p>
+            <p className="mt-2 text-xs text-slate-500">{"\uD83C\uDF93"} {designer.credentials.join(" \u00b7 ")}</p>
           )}
         </div>
       </div>
@@ -204,7 +235,12 @@ export default function DesignerProfilePage({ params }: DesignerProfilePageProps
                     </div>
                   ))}
                 </div>
-                {designs.length > filteredDesigns.length && (
+                {filteredDesigns.length === 0 && (
+                  <p className="py-8 text-center text-sm text-slate-400">
+                    No designs match this filter.
+                  </p>
+                )}
+                {designs.length > 12 && (
                   <p className="text-center text-sm font-medium text-primary">
                     View All ({designer.total_ideas_posted}) &rarr;
                   </p>
@@ -221,8 +257,8 @@ export default function DesignerProfilePage({ params }: DesignerProfilePageProps
                       <h3 className="font-semibold text-slate-800">{service.title}</h3>
                       <p className="text-sm text-slate-500 line-clamp-3">{service.description}</p>
                       <div className="text-xs text-slate-400">
-                        \uD83D\uDCE6 {service.estimated_delivery_days === 0 ? "Same day" : `${service.estimated_delivery_days} day${service.estimated_delivery_days > 1 ? "s" : ""}`}
-                        {service.max_revisions > 0 && <span> &middot; \uD83D\uDD04 {service.max_revisions} revision{service.max_revisions > 1 ? "s" : ""}</span>}
+                        {"\uD83D\uDCE6"} {service.estimated_delivery_days === 0 ? "Same day" : `${service.estimated_delivery_days} day${service.estimated_delivery_days > 1 ? "s" : ""}`}
+                        {service.max_revisions > 0 && <span> &middot; {"\uD83D\uDD04"} {service.max_revisions} revision{service.max_revisions > 1 ? "s" : ""}</span>}
                       </div>
                       <p className="text-xl font-bold text-primary">${service.price}</p>
                       <Link href={`/book/${service.id}`}>
@@ -253,7 +289,7 @@ export default function DesignerProfilePage({ params }: DesignerProfilePageProps
                       <div className="flex-1 space-y-1">
                         {ratingBreakdown.map((row) => (
                           <div key={row.stars} className="flex items-center gap-2 text-xs">
-                            <span className="w-4 text-right text-slate-500">{row.stars}\u2605</span>
+                            <span className="w-4 text-right text-slate-500">{row.stars}{"\u2605"}</span>
                             <div className="h-2 flex-1 rounded-full bg-slate-100">
                               <div
                                 className="h-full rounded-full bg-primary"
@@ -319,7 +355,9 @@ export default function DesignerProfilePage({ params }: DesignerProfilePageProps
                 <h3 className="font-semibold text-slate-800">Work with {designer.display_name.split(" ")[0]}</h3>
                 <div>
                   <span className="text-xs text-slate-400">Starting from</span>
-                  <p className="text-2xl font-bold text-primary">${Math.min(...services.map((s) => s.price))}</p>
+                  <p className="text-2xl font-bold text-primary">
+                    ${services.length > 0 ? Math.min(...services.map((s) => s.price)) : "—"}
+                  </p>
                 </div>
                 <Button className="w-full" onClick={() => setActiveTab("services")}>View Services &rarr;</Button>
                 <hr />
