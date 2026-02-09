@@ -1,17 +1,19 @@
 "use client";
 
-import { use } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, Bookmark, Share2, ChevronLeft, ChevronRight, ShoppingCart, ArrowRight } from "lucide-react";
+import { Heart, Bookmark, Share2, ChevronLeft, ChevronRight, ShoppingCart, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DesignerBadge, GalleryCard, ProductTagDot } from "@/components/gallery";
-import { designIdeas, designerServices } from "@/data/gallery-data";
-import { Difficulty, type DesignIdea } from "@/types/database";
+import { Difficulty, type DesignIdea, type DesignService } from "@/types/database";
 import { cn } from "@/lib/utils";
 import { Star } from "lucide-react";
+
+const BLUR_PLACEHOLDER =
+  "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAEAAQDASIAAhEBAxEB/8QAFAABAAAAAAAAAAAAAAAAAAAABv/EABQQAQAAAAAAAAAAAAAAAAAAAAD/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8AkAB//9k=";
 
 interface DesignDetailPageProps {
   readonly params: Promise<{ id: string }>;
@@ -28,10 +30,56 @@ function formatLabel(val: string): string {
 }
 
 export default function DesignDetailPage({ params }: DesignDetailPageProps) {
-  const { id } = use(params);
-  const design = designIdeas.find((d) => d.id === id) ?? designIdeas[0];
-  const relatedDesigns = designIdeas.filter((d) => d.id !== design.id && d.room_type === design.room_type).slice(0, 6);
-  const services = designerServices.filter((s) => s.designer_id === design.designer?.id);
+  const [design, setDesign] = useState<DesignIdea | null>(null);
+  const [services, setServices] = useState<DesignService[]>([]);
+  const [relatedDesigns, setRelatedDesigns] = useState<DesignIdea[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function load() {
+      const { id } = await params;
+
+      // Fetch design detail
+      const res = await fetch(`/api/designs/${id}`);
+      if (!res.ok) return;
+      const { data } = await res.json();
+      if (cancelled) return;
+      setDesign(data);
+
+      // Fetch services and similar designs in parallel
+      const [servicesRes, similarRes] = await Promise.all([
+        data.designer?.id ? fetch(`/api/designers/${data.designer.id}/services`) : Promise.resolve(null),
+        fetch(`/api/designs/${id}/similar`),
+      ]);
+
+      if (cancelled) return;
+
+      if (servicesRes?.ok) {
+        const servicesJson = await servicesRes.json();
+        setServices(servicesJson.data ?? []);
+      }
+
+      if (similarRes.ok) {
+        const similarJson = await similarRes.json();
+        setRelatedDesigns(similarJson.data ?? []);
+      }
+
+      setLoading(false);
+    }
+
+    load();
+    return () => { cancelled = true; };
+  }, [params]);
+
+  if (loading || !design) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="size-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -43,6 +91,8 @@ export default function DesignDetailPage({ params }: DesignDetailPageProps) {
           fill
           className="object-cover"
           priority
+          placeholder="blur"
+          blurDataURL={BLUR_PLACEHOLDER}
         />
 
         {/* Product tag dots */}
@@ -110,7 +160,7 @@ export default function DesignDetailPage({ params }: DesignDetailPageProps) {
           <div className="hidden gap-2 sm:flex">
             <Button variant="outline">Follow</Button>
             <Link href={`/designers/${design.designer?.id}`}>
-              <Button>Hire {design.designer?.display_name.split(" ")[0]} &rarr;</Button>
+              <Button>Hire {design.designer?.display_name?.split(" ")[0]} &rarr;</Button>
             </Link>
           </div>
         </div>
@@ -127,9 +177,9 @@ export default function DesignDetailPage({ params }: DesignDetailPageProps) {
             <div className="flex flex-wrap gap-2">
               <Badge variant="secondary" className="bg-emerald-100 text-emerald-700">{formatLabel(design.room_type)}</Badge>
               <Badge variant="secondary" className="bg-emerald-100 text-emerald-700">{formatLabel(design.style)}</Badge>
-              <Badge variant="secondary" className={difficultyStyles[design.difficulty_level]}>\uD83D\uDCD0 {formatLabel(design.difficulty_level)}</Badge>
-              {design.is_diy_friendly && <Badge variant="secondary" className="bg-green-100 text-green-700">\u2713 DIY Friendly</Badge>}
-              {design.estimated_cost != null && <Badge variant="secondary" className="bg-slate-100 text-slate-700">\uD83D\uDCB0 ~${design.estimated_cost.toLocaleString()}</Badge>}
+              <Badge variant="secondary" className={difficultyStyles[design.difficulty_level]}>{"\uD83D\uDCD0"} {formatLabel(design.difficulty_level)}</Badge>
+              {design.is_diy_friendly && <Badge variant="secondary" className="bg-green-100 text-green-700">{"\u2713"} DIY Friendly</Badge>}
+              {design.estimated_cost != null && <Badge variant="secondary" className="bg-slate-100 text-slate-700">{"\uD83D\uDCB0"} ~${design.estimated_cost.toLocaleString()}</Badge>}
             </div>
 
             {/* Description */}
@@ -169,6 +219,8 @@ export default function DesignDetailPage({ params }: DesignDetailPageProps) {
                             width={48}
                             height={48}
                             className="size-12 rounded-md object-cover"
+                            placeholder="blur"
+                            blurDataURL={BLUR_PLACEHOLDER}
                           />
                         )}
                         <div className="flex-1 min-w-0">
@@ -218,7 +270,7 @@ export default function DesignDetailPage({ params }: DesignDetailPageProps) {
                     <h3 className="font-semibold text-slate-800">{service.title}</h3>
                     <p className="text-sm text-slate-500 line-clamp-2">{service.description}</p>
                     <p className="text-xs text-slate-400">
-                      \uD83D\uDCE6 {service.estimated_delivery_days === 0 ? "Same day" : `${service.estimated_delivery_days} day${service.estimated_delivery_days > 1 ? "s" : ""}`} {service.max_revisions > 0 && `\u00b7 \uD83D\uDD04 ${service.max_revisions} revision${service.max_revisions > 1 ? "s" : ""}`}
+                      {"\uD83D\uDCE6"} {service.estimated_delivery_days === 0 ? "Same day" : `${service.estimated_delivery_days} day${service.estimated_delivery_days > 1 ? "s" : ""}`} {service.max_revisions > 0 && `\u00b7 \uD83D\uDD04 ${service.max_revisions} revision${service.max_revisions > 1 ? "s" : ""}`}
                     </p>
                     <p className="text-xl font-bold text-primary">${service.price}</p>
                     <Button size="sm" className="w-full">Book Now</Button>

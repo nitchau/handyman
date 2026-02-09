@@ -1,17 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GalleryCard, FilterChipBar } from "@/components/gallery";
 import {
-  designIdeas,
   roomTypeOptions,
   styleOptions,
   budgetOptions,
   sortOptions,
 } from "@/data/gallery-data";
+import type { DesignIdea } from "@/types/database";
 import { Loader2 } from "lucide-react";
+import Link from "next/link";
+
+const PAGE_SIZE = 12;
 
 export default function DesignsPage() {
   const [roomFilter, setRoomFilter] = useState("all");
@@ -20,17 +23,76 @@ export default function DesignsPage() {
   const [sort, setSort] = useState("trending");
   const [diyOnly, setDiyOnly] = useState(false);
 
-  const filtered = designIdeas.filter((d) => {
-    if (roomFilter !== "all" && d.room_type !== roomFilter) return false;
-    if (styleFilter !== "all" && d.style !== styleFilter) return false;
-    if (diyOnly && !d.is_diy_friendly) return false;
-    const cost = d.estimated_cost ?? 0;
-    if (budget === "under1k" && cost >= 1000) return false;
-    if (budget === "1k-5k" && (cost < 1000 || cost >= 5000)) return false;
-    if (budget === "5k-15k" && (cost < 5000 || cost >= 15000)) return false;
-    if (budget === "15k+" && cost < 15000) return false;
-    return true;
-  });
+  const [designs, setDesigns] = useState<DesignIdea[]>([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [initialLoad, setInitialLoad] = useState(true);
+
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  const fetchDesigns = useCallback(async (pageNum: number, reset: boolean) => {
+    setIsLoading(true);
+    const params = new URLSearchParams({
+      page: String(pageNum),
+      limit: String(PAGE_SIZE),
+      sort,
+    });
+    if (roomFilter !== "all") params.set("room", roomFilter);
+    if (styleFilter !== "all") params.set("style", styleFilter);
+    if (budget !== "all") params.set("budget", budget);
+    if (diyOnly) params.set("diy", "true");
+
+    try {
+      const res = await fetch(`/api/designs?${params}`);
+      const json = await res.json();
+      const newData: DesignIdea[] = json.data ?? [];
+      const meta = json.meta ?? {};
+
+      if (reset) {
+        setDesigns(newData);
+      } else {
+        setDesigns((prev) => [...prev, ...newData]);
+      }
+
+      setHasMore(pageNum < (meta.totalPages ?? 1));
+    } catch {
+      // On error, stop loading more
+      setHasMore(false);
+    } finally {
+      setIsLoading(false);
+      setInitialLoad(false);
+    }
+  }, [roomFilter, styleFilter, budget, sort, diyOnly]);
+
+  // Reset and fetch page 1 when filters change
+  useEffect(() => {
+    setPage(1);
+    setHasMore(true);
+    fetchDesigns(1, true);
+  }, [fetchDesigns]);
+
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoading) {
+          setPage((prev) => {
+            const next = prev + 1;
+            fetchDesigns(next, false);
+            return next;
+          });
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, isLoading, fetchDesigns]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -43,9 +105,11 @@ export default function DesignsPage() {
               Stunning room designs by professional and community designers
             </p>
           </div>
-          <Button variant="outline" className="hidden sm:flex">
-            Upload Your Design
-          </Button>
+          <Link href="/dashboard/upload">
+            <Button variant="outline" className="hidden sm:flex">
+              Upload Your Design
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -102,32 +166,43 @@ export default function DesignsPage() {
       {/* Masonry grid */}
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-8">
         <div className="columns-2 gap-4 sm:columns-3 lg:columns-4">
-          {filtered.map((design) => (
+          {designs.map((design) => (
             <div key={design.id} className="mb-4 break-inside-avoid">
               <GalleryCard design={design} />
             </div>
           ))}
         </div>
 
-        {filtered.length === 0 && (
+        {designs.length === 0 && !isLoading && !initialLoad && (
           <div className="py-20 text-center text-slate-400">
             No designs match your filters. Try adjusting your criteria.
           </div>
         )}
 
-        {/* Infinite scroll indicator */}
-        {filtered.length > 0 && (
+        {/* Infinite scroll sentinel */}
+        <div ref={sentinelRef} className="h-1" />
+
+        {isLoading && (
           <div className="flex items-center justify-center gap-2 py-8 text-sm text-slate-400">
             <Loader2 className="size-4 animate-spin" />
             Loading more designs...
           </div>
         )}
+
+        {!hasMore && designs.length > 0 && !isLoading && (
+          <div className="py-8 text-center text-sm text-slate-400">
+            You&apos;ve seen all designs matching your filters.
+          </div>
+        )}
       </div>
 
       {/* FAB */}
-      <button className="fixed bottom-6 right-6 z-40 flex size-14 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-transform hover:scale-105">
+      <Link
+        href="/dashboard/upload"
+        className="fixed bottom-6 right-6 z-40 flex size-14 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-transform hover:scale-105"
+      >
         <Plus className="size-6" />
-      </button>
+      </Link>
     </div>
   );
 }

@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Upload, Star, Trash2, Pencil, ImagePlus, ArrowRight, Check, X } from "lucide-react";
+import Link from "next/link";
+import { Upload, Star, Trash2, Pencil, ImagePlus, ArrowRight, Check, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { RoomType, DesignStyle, Difficulty } from "@/types/database";
+import { RoomType, DesignStyle, Difficulty, BudgetTier } from "@/types/database";
 
 function formatLabel(val: string): string {
   return val.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
@@ -18,11 +19,19 @@ const STEPS = [
   { num: 3, label: "Tag Products" },
 ];
 
+const BUDGET_OPTIONS = [
+  { value: BudgetTier.BUDGET_UNDER_1000, label: "Under $1,000" },
+  { value: BudgetTier.MID_1000_5000, label: "$1,000 - $5,000" },
+  { value: BudgetTier.PREMIUM_5000_15000, label: "$5,000 - $15,000" },
+  { value: BudgetTier.LUXURY_15000_PLUS, label: "$15,000+" },
+];
+
 interface TaggedProduct {
   name: string;
   brand: string;
   price: string;
   category: string;
+  url: string;
 }
 
 export default function UploadDesignPage() {
@@ -39,13 +48,18 @@ export default function UploadDesignPage() {
   const [style, setStyle] = useState(DesignStyle.MODERN);
   const [difficulty, setDifficulty] = useState(Difficulty.BEGINNER);
   const [diyFriendly, setDiyFriendly] = useState(true);
+  const [budgetTier, setBudgetTier] = useState(BudgetTier.MID_1000_5000);
+  const [estimatedCost, setEstimatedCost] = useState("");
   const [tags, setTags] = useState<string[]>(["Renovation", "Color Pop"]);
   const [tagInput, setTagInput] = useState("");
-  const [taggedProducts] = useState<TaggedProduct[]>([
-    { name: "Velvet Sofa", brand: "West Elm", price: "$1,299", category: "Furniture" },
-    { name: "Arc Floor Lamp", brand: "CB2", price: "$249", category: "Lighting" },
-    { name: "Abstract Art Print", brand: "Minted", price: "$89", category: "Decor" },
+  const [taggedProducts, setTaggedProducts] = useState<TaggedProduct[]>([
+    { name: "Velvet Sofa", brand: "West Elm", price: "$1,299", category: "Furniture", url: "" },
+    { name: "Arc Floor Lamp", brand: "CB2", price: "$249", category: "Lighting", url: "" },
+    { name: "Abstract Art Print", brand: "Minted", price: "$89", category: "Decor", url: "" },
   ]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [newDesignId, setNewDesignId] = useState<string | null>(null);
 
   const removeTag = (tag: string) => setTags(tags.filter((t) => t !== tag));
   const addTag = () => {
@@ -60,6 +74,86 @@ export default function UploadDesignPage() {
     setPhotos(newPhotos);
     if (heroIndex >= newPhotos.length) setHeroIndex(0);
   };
+
+  const handlePublish = async () => {
+    if (!title.trim() || photos.length === 0) return;
+
+    setIsSubmitting(true);
+    try {
+      // POST design
+      const res = await fetch("/api/designs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          // For now designer_id uses first seed designer; real auth will replace this
+          designer_id: "00000000-0000-0000-0000-00000000dd01",
+          title,
+          description,
+          room_type: roomType,
+          style,
+          budget_tier: budgetTier,
+          estimated_cost: estimatedCost ? parseFloat(estimatedCost) : null,
+          difficulty_level: difficulty,
+          is_diy_friendly: diyFriendly,
+          media_urls: photos,
+          primary_photo_url: photos[heroIndex] ?? photos[0],
+          tags,
+          is_published: true,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to create design");
+      const { data } = await res.json();
+      const designId = data.id;
+
+      // POST each product tag
+      for (const product of taggedProducts) {
+        const priceNum = parseFloat(product.price.replace(/[^0-9.]/g, "")) || 0;
+        await fetch(`/api/designs/${designId}/products`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            product_name: product.name,
+            product_brand: product.brand,
+            product_category: product.category.toLowerCase(),
+            estimated_price: priceNum,
+            product_url: product.url || null,
+          }),
+        });
+      }
+
+      setNewDesignId(designId);
+      setSubmitted(true);
+    } catch (err) {
+      console.error("Upload failed:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (submitted && newDesignId) {
+    return (
+      <div className="mx-auto max-w-4xl space-y-8">
+        <Card>
+          <CardContent className="flex flex-col items-center gap-6 p-12 text-center">
+            <div className="flex size-16 items-center justify-center rounded-full bg-green-100">
+              <Check className="size-8 text-green-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-slate-900">Design Published!</h2>
+            <p className="text-slate-500">Your design is now live in the gallery.</p>
+            <div className="flex gap-3">
+              <Link href={`/designs/${newDesignId}`}>
+                <Button>View Your Design</Button>
+              </Link>
+              <Link href="/designs">
+                <Button variant="outline">Back to Gallery</Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-4xl space-y-8">
@@ -199,12 +293,22 @@ export default function UploadDesignPage() {
               </div>
               <div>
                 <label className="mb-1 block text-sm font-medium text-slate-700">Budget</label>
-                <select className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm">
-                  <option>$1,000 - $5,000</option>
-                  <option>$5,000 - $10,000</option>
-                  <option>$10,000+</option>
+                <select value={budgetTier} onChange={(e) => setBudgetTier(e.target.value as BudgetTier)} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm">
+                  {BUDGET_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               </div>
+            </div>
+
+            {/* Estimated Cost */}
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">Estimated Cost ($)</label>
+              <input
+                type="number"
+                value={estimatedCost}
+                onChange={(e) => setEstimatedCost(e.target.value)}
+                placeholder="e.g., 3500"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary"
+              />
             </div>
 
             {/* Difficulty + DIY Toggle */}
@@ -346,7 +450,12 @@ export default function UploadDesignPage() {
                       </div>
                       <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                         <button className="text-slate-400 hover:text-primary"><Pencil className="size-4" /></button>
-                        <button className="text-slate-400 hover:text-red-500"><Trash2 className="size-4" /></button>
+                        <button
+                          className="text-slate-400 hover:text-red-500"
+                          onClick={() => setTaggedProducts(taggedProducts.filter((_, j) => j !== i))}
+                        >
+                          <Trash2 className="size-4" />
+                        </button>
                       </div>
                     </li>
                   ))}
@@ -356,8 +465,12 @@ export default function UploadDesignPage() {
 
             <div className="mt-6 flex justify-between border-t pt-6">
               <Button variant="ghost" onClick={() => setStep(2)}>Back</Button>
-              <Button>
-                Finish & Publish <Check className="ml-2 size-4" />
+              <Button onClick={handlePublish} disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <><Loader2 className="mr-2 size-4 animate-spin" /> Publishing...</>
+                ) : (
+                  <>Finish & Publish <Check className="ml-2 size-4" /></>
+                )}
               </Button>
             </div>
           </CardContent>

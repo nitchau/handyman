@@ -1,21 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
-import { designers, designerServices } from "@/data/gallery-data";
+import { supabaseAdmin } from "@/lib/supabase/server";
 
 interface RouteContext {
   params: Promise<{ id: string }>;
 }
 
-// GET /api/designers/[id]/services — List designer's services
+// GET /api/designers/[id]/services — List designer's active services
 export async function GET(_req: NextRequest, { params }: RouteContext) {
   const { id } = await params;
-  const designer = designers.find((d) => d.id === id);
-  if (!designer) {
+
+  // Verify designer exists
+  const { data: designer, error: designerError } = await supabaseAdmin
+    .from("designer_profiles")
+    .select("id")
+    .eq("id", id)
+    .single();
+
+  if (designerError || !designer) {
     return NextResponse.json({ error: "Designer not found" }, { status: 404 });
   }
 
-  const services = designerServices.filter(
-    (s) => s.designer_id === id && s.is_active
-  );
+  const { data, error } = await supabaseAdmin
+    .from("designer_services")
+    .select("*")
+    .eq("designer_id", id)
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true });
 
-  return NextResponse.json({ data: services });
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ data: data ?? [] });
 }

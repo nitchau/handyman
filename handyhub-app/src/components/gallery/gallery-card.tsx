@@ -8,6 +8,10 @@ import { DesignerBadge } from "./designer-badge";
 import { Difficulty, type DesignIdea } from "@/types/database";
 import { Badge } from "@/components/ui/badge";
 
+// Tiny 4x4 grey gradient JPEG for blur placeholder (~100 bytes base64)
+const BLUR_PLACEHOLDER =
+  "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAEAAQDASIAAhEBAxEB/8QAFAABAAAAAAAAAAAAAAAAAAAABv/EABQQAQAAAAAAAAAAAAAAAAAAAAD/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8AkAB//9k=";
+
 interface GalleryCardProps {
   readonly design: DesignIdea;
   readonly className?: string;
@@ -44,6 +48,8 @@ export function GalleryCard({ design, className }: GalleryCardProps) {
             width={400}
             height={500}
             className="h-auto w-full object-cover"
+            placeholder="blur"
+            blurDataURL={BLUR_PLACEHOLDER}
           />
 
           {/* Hover overlay (desktop) */}

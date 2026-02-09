@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { designers } from "@/data/gallery-data";
+import { supabaseAdmin } from "@/lib/supabase/server";
 
 // GET /api/designers — Browse/search designers
 export async function GET(req: NextRequest) {
@@ -9,27 +9,28 @@ export async function GET(req: NextRequest) {
   const tier = searchParams.get("tier");
   const accepting = searchParams.get("accepting_clients");
 
-  let results = [...designers];
+  let query = supabaseAdmin.from("designer_profiles").select("*", { count: "exact" });
 
-  if (q) {
-    results = results.filter(
-      (d) =>
-        d.display_name.toLowerCase().includes(q) ||
-        (d.bio?.toLowerCase().includes(q) ?? false) ||
-        d.style_tags.some((t) => t.toLowerCase().includes(q))
-    );
-  }
-  if (specialty) {
-    results = results.filter((d) =>
-      d.specialties.some((s) => s === specialty)
-    );
-  }
   if (tier) {
-    results = results.filter((d) => d.designer_tier === tier);
+    query = query.eq("designer_tier", tier);
   }
   if (accepting === "true") {
-    results = results.filter((d) => d.is_accepting_clients);
+    query = query.eq("is_accepting_clients", true);
+  }
+  if (specialty) {
+    query = query.contains("specialties", [specialty]);
+  }
+  if (q) {
+    query = query.or(`display_name.ilike.%${q}%,bio.ilike.%${q}%`);
   }
 
-  return NextResponse.json({ data: results, meta: { total: results.length } });
+  query = query.order("rating_avg", { ascending: false });
+
+  const { data, count, error } = await query;
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ data: data ?? [], meta: { total: count ?? 0 } });
 }

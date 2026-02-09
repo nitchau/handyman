@@ -1,27 +1,43 @@
 import { NextRequest, NextResponse } from "next/server";
-import { designIdeas } from "@/data/gallery-data";
+import { supabaseAdmin } from "@/lib/supabase/server";
 
 interface RouteContext {
   params: Promise<{ id: string }>;
 }
 
-// GET /api/designs/[id]/similar — AI-recommended similar designs (mock)
+// GET /api/designs/[id]/similar — Similar designs by room_type or style
 export async function GET(_req: NextRequest, { params }: RouteContext) {
   const { id } = await params;
-  const idea = designIdeas.find((d) => d.id === id);
-  if (!idea) {
+
+  // Fetch the current design to get its room_type and style
+  const { data: idea, error: ideaError } = await supabaseAdmin
+    .from("design_ideas")
+    .select("id, room_type, style")
+    .eq("id", id)
+    .single();
+
+  if (ideaError || !idea) {
     return NextResponse.json({ error: "Design idea not found" }, { status: 404 });
   }
 
-  // Mock: return designs that share the same style or room type, excluding the current one
-  const similar = designIdeas
-    .filter(
-      (d) =>
-        d.id !== id &&
-        d.is_published &&
-        (d.style === idea.style || d.room_type === idea.room_type)
+  // Query designs that share room_type or style, excluding current
+  const { data, error } = await supabaseAdmin
+    .from("design_ideas")
+    .select(
+      "*, designer:designer_profiles!designer_id(id, user_id, display_name, avatar_url, designer_tier, rating_avg, review_count)"
     )
-    .slice(0, 6);
+    .eq("is_published", true)
+    .neq("id", id)
+    .or(`room_type.eq.${idea.room_type},style.eq.${idea.style}`)
+    .order("view_count", { ascending: false })
+    .limit(6);
 
-  return NextResponse.json({ data: similar });
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  // Add empty product_tags for consistency
+  const results = (data ?? []).map((d) => ({ ...d, product_tags: [] }));
+
+  return NextResponse.json({ data: results });
 }
