@@ -61,6 +61,21 @@ export enum BudgetTier {
   LUXURY_15000_PLUS = "luxury_15000_plus",
 }
 
+export enum ProductCategory {
+  FLOORING = "flooring",
+  PAINT = "paint",
+  TILE = "tile",
+  FIXTURES = "fixtures",
+  LIGHTING = "lighting",
+  HARDWARE = "hardware",
+  FURNITURE = "furniture",
+  DECOR = "decor",
+  APPLIANCES = "appliances",
+  CABINETRY = "cabinetry",
+  COUNTERTOPS = "countertops",
+  OTHER = "other",
+}
+
 export enum OrderStatus {
   NEW = "new",
   IN_PROGRESS = "in_progress",
@@ -345,15 +360,20 @@ export interface DesignerProfile {
 
 export interface ProductTag {
   id: string;
-  name: string;
-  brand: string;
-  category: string;
-  price: string;
-  retailer: string;
-  retailer_url: string;
-  image_url: string;
-  position_x: number;
-  position_y: number;
+  design_idea_id: string;
+  product_name: string;
+  product_brand: string | null;
+  product_category: ProductCategory;
+  estimated_price: number;
+  retailer_name: string | null;
+  product_url: string | null;
+  product_image_url: string | null;
+  quantity_needed: string | null;
+  notes: string | null;
+  position_x: number | null;
+  position_y: number | null;
+  sort_order: number;
+  created_at: string;
 }
 
 export interface DesignIdea {

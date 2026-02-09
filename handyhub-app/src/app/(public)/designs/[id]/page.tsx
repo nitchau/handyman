@@ -162,20 +162,22 @@ export default function DesignDetailPage({ params }: DesignDetailPageProps) {
                   <>
                     {design.product_tags.map((tag, i) => (
                       <div key={tag.id} className={cn("flex items-center gap-3 py-3", i > 0 && "border-t")}>
-                        <Image
-                          src={tag.image_url}
-                          alt={tag.name}
-                          width={48}
-                          height={48}
-                          className="size-12 rounded-md object-cover"
-                        />
+                        {tag.product_image_url && (
+                          <Image
+                            src={tag.product_image_url}
+                            alt={tag.product_name}
+                            width={48}
+                            height={48}
+                            className="size-12 rounded-md object-cover"
+                          />
+                        )}
                         <div className="flex-1 min-w-0">
-                          <p className="truncate text-sm font-medium text-slate-800">{tag.name}</p>
-                          <p className="text-xs text-slate-500">{tag.brand} &middot; {tag.retailer}</p>
+                          <p className="truncate text-sm font-medium text-slate-800">{tag.product_name}</p>
+                          <p className="text-xs text-slate-500">{tag.product_brand}{tag.retailer_name && <> &middot; {tag.retailer_name}</>}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-semibold text-primary">{tag.price}</p>
-                          <button className="text-xs font-medium text-primary hover:underline">Buy &rarr;</button>
+                          <p className="text-sm font-semibold text-primary">${tag.estimated_price.toFixed(2)}</p>
+                          {tag.product_url && <a href={tag.product_url} className="text-xs font-medium text-primary hover:underline">Buy &rarr;</a>}
                         </div>
                       </div>
                     ))}

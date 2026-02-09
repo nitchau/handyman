@@ -16,7 +16,7 @@ export function ProductTagDot({ tag }: ProductTagDotProps) {
   return (
     <div
       className="absolute z-10"
-      style={{ left: `${tag.position_x}%`, top: `${tag.position_y}%` }}
+      style={{ left: `${tag.position_x ?? 0}%`, top: `${tag.position_y ?? 0}%` }}
     >
       {/* Dot */}
       <button
@@ -37,24 +37,28 @@ export function ProductTagDot({ tag }: ProductTagDotProps) {
             <X className="size-3.5" />
           </button>
           <div className="flex gap-2.5">
-            <Image
-              src={tag.image_url}
-              alt={tag.name}
-              width={48}
-              height={48}
-              className="size-12 rounded-md object-cover"
-            />
+            {tag.product_image_url && (
+              <Image
+                src={tag.product_image_url}
+                alt={tag.product_name}
+                width={48}
+                height={48}
+                className="size-12 rounded-md object-cover"
+              />
+            )}
             <div className="flex-1 space-y-0.5">
-              <p className="text-xs font-semibold text-slate-800 leading-tight">{tag.name}</p>
+              <p className="text-xs font-semibold text-slate-800 leading-tight">{tag.product_name}</p>
               <p className="text-[11px] text-slate-500">
-                {tag.brand} &middot; {tag.retailer}
+                {tag.product_brand}{tag.retailer_name && <> &middot; {tag.retailer_name}</>}
               </p>
-              <p className="text-sm font-semibold text-primary">{tag.price}</p>
+              <p className="text-sm font-semibold text-primary">${tag.estimated_price.toFixed(2)}</p>
             </div>
           </div>
-          <Button size="sm" className="mt-2 h-7 w-full text-xs">
-            Buy at {tag.retailer} &rarr;
-          </Button>
+          {tag.retailer_name && (
+            <Button size="sm" className="mt-2 h-7 w-full text-xs">
+              Buy at {tag.retailer_name} &rarr;
+            </Button>
+          )}
         </div>
       )}
     </div>
