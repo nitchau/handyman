@@ -86,6 +86,7 @@ export const DASHBOARD_NAV: Record<string, NavItem[]> = {
     { label: "Orders", href: "/dashboard/orders", icon: "ShoppingBag" },
     { label: "Earnings", href: "/dashboard/earnings", icon: "DollarSign" },
     { label: "Upload Design", href: "/dashboard/upload", icon: "Upload" },
+    { label: "My Services", href: "/dashboard/services/new", icon: "Briefcase" },
     { label: "Settings", href: "/dashboard/settings", icon: "Settings" },
   ],
   admin: [
