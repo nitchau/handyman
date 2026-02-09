@@ -14,9 +14,10 @@ import { Button } from "@/components/ui/button";
 interface ProfileStepProps {
   isFinalStep: boolean;
   onComplete: () => void;
+  saving?: boolean;
 }
 
-export function ProfileStep({ isFinalStep, onComplete }: ProfileStepProps) {
+export function ProfileStep({ isFinalStep, onComplete, saving }: ProfileStepProps) {
   const { formData, setFormData, nextStep, prevStep } = useOnboardingStore();
 
   const {
@@ -119,8 +120,8 @@ export function ProfileStep({ isFinalStep, onComplete }: ProfileStepProps) {
           <Button type="button" variant="outline" onClick={prevStep}>
             Back
           </Button>
-          <Button type="submit">
-            {isFinalStep ? "Complete Setup" : "Continue"}
+          <Button type="submit" disabled={saving}>
+            {saving ? "Saving..." : isFinalStep ? "Complete Setup" : "Continue"}
           </Button>
         </div>
       </form>

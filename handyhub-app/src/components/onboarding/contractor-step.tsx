@@ -42,9 +42,10 @@ type ContractorDetailsValues = z.infer<typeof contractorDetailsSchema>;
 
 interface ContractorStepProps {
   onComplete: () => void;
+  saving?: boolean;
 }
 
-export function ContractorStep({ onComplete }: ContractorStepProps) {
+export function ContractorStep({ onComplete, saving }: ContractorStepProps) {
   const { formData, setFormData, prevStep } = useOnboardingStore();
 
   const {
@@ -239,7 +240,9 @@ export function ContractorStep({ onComplete }: ContractorStepProps) {
           <Button type="button" variant="outline" onClick={prevStep}>
             Back
           </Button>
-          <Button type="submit">Complete Setup</Button>
+          <Button type="submit" disabled={saving}>
+            {saving ? "Saving..." : "Complete Setup"}
+          </Button>
         </div>
       </form>
     </div>

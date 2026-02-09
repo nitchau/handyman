@@ -3,7 +3,7 @@ import { z } from "zod";
 // ── Role Selection ─────────────────────────────────────────────────────
 
 export const roleSelectionSchema = z.object({
-  role: z.enum(["diy_user", "homeowner", "contractor"], {
+  role: z.enum(["diy_user", "homeowner", "contractor", "designer"], {
     message: "Please select a role",
   }),
 });
