@@ -4,9 +4,15 @@ const isWebhookRoute = createRouteMatcher([
   '/api/webhooks(.*)',
 ]);
 
+const isPublicApiRoute = createRouteMatcher([
+  '/api/designs(.*)',
+  '/api/designers(.*)',
+  '/api/designs/featured(.*)',
+]);
+
 const isProtectedRoute = createRouteMatcher([
   '/dashboard(.*)',
-  '/api/designer(.*)',
+  '/api/designer/(.*)',
 ]);
 
 const isDesignerRoute = createRouteMatcher([
@@ -16,12 +22,15 @@ const isDesignerRoute = createRouteMatcher([
   '/dashboard/services(.*)',
   '/dashboard/orders(.*)',
   '/dashboard/earnings(.*)',
-  '/api/designer(.*)',
+  '/api/designer/(.*)',
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
   // Webhook routes use their own signature verification — skip Clerk auth
   if (isWebhookRoute(req)) return;
+
+  // Public API routes — no auth required
+  if (isPublicApiRoute(req)) return;
 
   if (isProtectedRoute(req)) {
     await auth.protect();
