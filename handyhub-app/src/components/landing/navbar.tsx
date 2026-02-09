@@ -11,16 +11,19 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-
-const navLinks = [
-  { label: "Design Ideas", href: "/designs" },
-  { label: "Find Pros", href: "/contractors" },
-  { label: "Tool Rentals", href: "/tools" },
-  { label: "How It Works", href: "#how-it-works" },
-];
+import { LanguageSwitcher } from "@/components/ui/language-switcher";
+import { useTranslation } from "@/lib/i18n/language-context";
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { t } = useTranslation();
+
+  const navLinks = [
+    { label: t("nav.designIdeas"), href: "/designs" },
+    { label: t("nav.findPros"), href: "/contractors" },
+    { label: t("nav.toolRentals"), href: "/tools" },
+    { label: t("nav.howItWorks"), href: "#how-it-works" },
+  ];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-white">
@@ -51,11 +54,11 @@ export function Navbar() {
           <SignedOut>
             <SignInButton>
               <button className="text-sm font-medium text-slate-700 hover:text-primary cursor-pointer">
-                Sign In
+                {t("nav.signIn")}
               </button>
             </SignInButton>
             <SignUpButton>
-              <Button size="sm">Get Started Free</Button>
+              <Button size="sm">{t("nav.getStarted")}</Button>
             </SignUpButton>
           </SignedOut>
           <SignedIn>
@@ -63,10 +66,13 @@ export function Navbar() {
               href="/dashboard"
               className="text-sm font-medium text-slate-700 hover:text-primary"
             >
-              Dashboard
+              {t("nav.dashboard")}
             </Link>
             <UserButton />
           </SignedIn>
+          <div className="border-l border-border pl-4">
+            <LanguageSwitcher />
+          </div>
         </div>
 
         {/* Mobile hamburger */}
@@ -101,12 +107,12 @@ export function Navbar() {
             <SignedOut>
               <SignInButton>
                 <button className="text-sm font-medium text-slate-700 text-left cursor-pointer">
-                  Sign In
+                  {t("nav.signIn")}
                 </button>
               </SignInButton>
               <SignUpButton>
                 <Button size="sm" className="w-full">
-                  Get Started Free
+                  {t("nav.getStarted")}
                 </Button>
               </SignUpButton>
             </SignedOut>
@@ -116,12 +122,14 @@ export function Navbar() {
                 className="text-sm font-medium text-slate-700"
                 onClick={() => setMobileOpen(false)}
               >
-                Dashboard
+                {t("nav.dashboard")}
               </Link>
               <div className="pt-1">
                 <UserButton />
               </div>
             </SignedIn>
+            <hr className="border-border" />
+            <LanguageSwitcher />
           </nav>
         </div>
       )}

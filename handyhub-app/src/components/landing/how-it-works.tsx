@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Lightbulb,
   PenLine,
@@ -5,37 +7,40 @@ import {
   ShoppingCart,
   Hammer,
 } from "lucide-react";
-
-const steps = [
-  {
-    icon: <Lightbulb className="size-5" />,
-    title: "Ideate",
-    description: "Browse styles and gather inspiration for your project.",
-    active: true,
-  },
-  {
-    icon: <PenLine className="size-5" />,
-    title: "Design",
-    description: "Visualize your dream space with AI-powered tools.",
-  },
-  {
-    icon: <ClipboardList className="size-5" />,
-    title: "Plan",
-    description: "Create budgets, timelines, and material lists.",
-  },
-  {
-    icon: <ShoppingCart className="size-5" />,
-    title: "Source",
-    description: "Compare prices and find local suppliers.",
-  },
-  {
-    icon: <Hammer className="size-5" />,
-    title: "Build",
-    description: "DIY with guides or hire a verified pro.",
-  },
-];
+import { useTranslation } from "@/lib/i18n/language-context";
 
 export function HowItWorks() {
+  const { t } = useTranslation();
+
+  const steps = [
+    {
+      icon: <Lightbulb className="size-5" />,
+      title: t("howItWorks.step1.title"),
+      description: t("howItWorks.step1.desc"),
+      active: true,
+    },
+    {
+      icon: <PenLine className="size-5" />,
+      title: t("howItWorks.step2.title"),
+      description: t("howItWorks.step2.desc"),
+    },
+    {
+      icon: <ClipboardList className="size-5" />,
+      title: t("howItWorks.step3.title"),
+      description: t("howItWorks.step3.desc"),
+    },
+    {
+      icon: <ShoppingCart className="size-5" />,
+      title: t("howItWorks.step4.title"),
+      description: t("howItWorks.step4.desc"),
+    },
+    {
+      icon: <Hammer className="size-5" />,
+      title: t("howItWorks.step5.title"),
+      description: t("howItWorks.step5.desc"),
+    },
+  ];
+
   return (
     <section
       id="how-it-works"
@@ -43,7 +48,7 @@ export function HowItWorks() {
     >
       <div className="mx-auto max-w-[1100px]">
         <h2 className="mb-16 text-center text-3xl font-extrabold tracking-tight text-slate-900">
-          How It Works
+          {t("howItWorks.heading")}
         </h2>
 
         <div className="relative">
@@ -53,7 +58,7 @@ export function HowItWorks() {
           <div className="relative z-10 grid grid-cols-1 gap-10 md:grid-cols-5">
             {steps.map((step, i) => (
               <div
-                key={step.title}
+                key={i}
                 className="group flex flex-col items-center text-center"
               >
                 <div

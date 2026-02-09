@@ -1,4 +1,5 @@
 import {
+  BarChart3,
   Bath,
   Briefcase,
   ChefHat,
@@ -29,6 +30,7 @@ import {
 } from "lucide-react";
 
 const iconMap: Record<string, LucideIcon> = {
+  BarChart3,
   Bath,
   Briefcase,
   ChefHat,

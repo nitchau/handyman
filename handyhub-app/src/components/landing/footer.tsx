@@ -1,33 +1,50 @@
+"use client";
+
 import { Home } from "lucide-react";
 import Link from "next/link";
-
-const footerLinks = {
-  Platform: [
-    { label: "Design Ideas", href: "/designs" },
-    { label: "Find Contractors", href: "/contractors" },
-    { label: "Tool Rentals", href: "/tools" },
-    { label: "How It Works", href: "#" },
-    { label: "AI Project Planner", href: "#" },
-  ],
-  "For Pros": [
-    { label: "Find Work", href: "#" },
-    { label: "Verification", href: "#" },
-    { label: "Escrow Payments", href: "#" },
-  ],
-  Company: [
-    { label: "About", href: "#" },
-    { label: "Blog", href: "#" },
-    { label: "Careers", href: "#" },
-    { label: "Contact", href: "#" },
-  ],
-  Legal: [
-    { label: "Privacy Policy", href: "#" },
-    { label: "Terms of Service", href: "#" },
-    { label: "Cookie Policy", href: "#" },
-  ],
-};
+import { useTranslation } from "@/lib/i18n/language-context";
 
 export function Footer() {
+  const { t } = useTranslation();
+
+  const footerSections = [
+    {
+      heading: t("footer.platform"),
+      links: [
+        { label: t("footer.platform.designIdeas"), href: "/designs" },
+        { label: t("footer.platform.findContractors"), href: "/contractors" },
+        { label: t("footer.platform.toolRentals"), href: "/tools" },
+        { label: t("footer.platform.howItWorks"), href: "#" },
+        { label: t("footer.platform.aiPlanner"), href: "#" },
+      ],
+    },
+    {
+      heading: t("footer.forPros"),
+      links: [
+        { label: t("footer.forPros.findWork"), href: "#" },
+        { label: t("footer.forPros.verification"), href: "#" },
+        { label: t("footer.forPros.escrowPayments"), href: "#" },
+      ],
+    },
+    {
+      heading: t("footer.company"),
+      links: [
+        { label: t("footer.company.about"), href: "#" },
+        { label: t("footer.company.blog"), href: "#" },
+        { label: t("footer.company.careers"), href: "#" },
+        { label: t("footer.company.contact"), href: "#" },
+      ],
+    },
+    {
+      heading: t("footer.legal"),
+      links: [
+        { label: t("footer.legal.privacy"), href: "#" },
+        { label: t("footer.legal.terms"), href: "#" },
+        { label: t("footer.legal.cookies"), href: "#" },
+      ],
+    },
+  ];
+
   return (
     <footer className="border-t border-border bg-white px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
@@ -39,18 +56,18 @@ export function Footer() {
               <span className="text-lg font-bold text-primary">HandyHub</span>
             </Link>
             <p className="mt-3 text-sm text-slate-500">
-              Every home project starts here.
+              {t("footer.tagline")}
             </p>
           </div>
 
           {/* Link columns */}
-          {Object.entries(footerLinks).map(([heading, links]) => (
-            <div key={heading}>
+          {footerSections.map((section) => (
+            <div key={section.heading}>
               <h4 className="text-sm font-semibold text-slate-800">
-                {heading}
+                {section.heading}
               </h4>
               <ul className="mt-3 space-y-2">
-                {links.map((link) => (
+                {section.links.map((link) => (
                   <li key={link.label}>
                     <Link
                       href={link.href}
@@ -66,7 +83,7 @@ export function Footer() {
         </div>
 
         <div className="mt-10 border-t border-border pt-6 text-center text-xs text-slate-400">
-          &copy; {new Date().getFullYear()} HandyHub. All rights reserved.
+          &copy; {new Date().getFullYear()} {t("footer.copyright")}
         </div>
       </div>
     </footer>

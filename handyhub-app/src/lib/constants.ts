@@ -46,11 +46,17 @@ export const CATEGORIES = [
 
 // ── Dashboard Navigation ───────────────────────────────────────────────
 
-export interface NavItem {
+export interface NavLink {
   label: string;
   href: string;
   icon: string;
 }
+
+export interface NavDivider {
+  type: "divider";
+}
+
+export type NavItem = NavLink | NavDivider;
 
 export const DASHBOARD_NAV: Record<string, NavItem[]> = {
   diy_user: [
@@ -66,9 +72,9 @@ export const DASHBOARD_NAV: Record<string, NavItem[]> = {
     { label: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
     { label: "My Projects", href: "/dashboard/projects", icon: "FolderOpen" },
     { label: "My Plans", href: "/dashboard/plans", icon: "ClipboardList" },
-    { label: "Design Ideas", href: "/designs", icon: "Palette" },
     { label: "Post a Project", href: "/dashboard/projects/new", icon: "PlusCircle" },
     { label: "Find a Contractor", href: "/contractors", icon: "Search" },
+    { label: "Design Ideas", href: "/designs", icon: "Palette" },
     { label: "Tool Rentals", href: "/tools", icon: "Wrench" },
     { label: "Messages", href: "/dashboard/messages", icon: "MessageSquare" },
     { label: "Settings", href: "/dashboard/settings", icon: "Settings" },
@@ -81,15 +87,17 @@ export const DASHBOARD_NAV: Record<string, NavItem[]> = {
     { label: "Settings", href: "/dashboard/settings", icon: "Settings" },
   ],
   designer: [
-    { label: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
-    { label: "My Designs", href: "/dashboard/designs", icon: "Palette" },
-    { label: "Orders", href: "/dashboard/orders", icon: "ShoppingBag" },
+    { label: "Dashboard Home", href: "/dashboard", icon: "LayoutDashboard" },
+    { label: "My Design Ideas", href: "/dashboard/designs", icon: "Palette" },
+    { label: "Upload New Idea", href: "/dashboard/upload", icon: "PlusCircle" },
+    { label: "My Services", href: "/dashboard/services", icon: "ShoppingBag" },
+    { label: "Orders", href: "/dashboard/orders", icon: "ClipboardList" },
     { label: "Earnings", href: "/dashboard/earnings", icon: "DollarSign" },
-    { label: "Upload Design", href: "/dashboard/upload", icon: "Upload" },
-    { label: "My Services", href: "/dashboard/services/new", icon: "Briefcase" },
-    { label: "Plan a Project", href: "/plan", icon: "Lightbulb" },
-    { label: "Tool Rentals", href: "/tools", icon: "Wrench" },
-    { label: "Find a Contractor", href: "/contractors", icon: "Search" },
+    { label: "Analytics", href: "/dashboard/analytics", icon: "BarChart3" },
+    { type: "divider" },
+    { label: "Messages", href: "/dashboard/messages", icon: "MessageSquare" },
+    { label: "Community", href: "/community", icon: "Users" },
+    { type: "divider" },
     { label: "Settings", href: "/dashboard/settings", icon: "Settings" },
   ],
   admin: [

@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Hammer,
   Home,
@@ -29,6 +31,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useTranslation } from "@/lib/i18n/language-context";
 
 interface BulletItem {
   icon: React.ReactNode;
@@ -44,6 +47,7 @@ interface TileProps {
   ctaHref: string;
   ctaVariant: "default" | "outline";
   featured?: boolean;
+  featuredLabel?: string;
 }
 
 function Tile({
@@ -55,6 +59,7 @@ function Tile({
   ctaHref,
   ctaVariant,
   featured,
+  featuredLabel,
 }: TileProps) {
   return (
     <Card
@@ -64,7 +69,7 @@ function Tile({
     >
       {featured && (
         <Badge className="absolute -top-3 right-4 bg-primary text-white">
-          Most Popular
+          {featuredLabel}
         </Badge>
       )}
       <CardHeader className="items-center text-center">
@@ -96,37 +101,40 @@ function Tile({
 }
 
 export function AudienceTiles() {
+  const { t } = useTranslation();
+
   return (
     <section className="px-4 py-12 sm:px-6 lg:px-8">
       <h2 className="mb-12 text-center text-2xl font-bold text-slate-900">
-        Choose Your Path
+        {t("audience.heading")}
       </h2>
       <div className="mx-auto grid max-w-7xl gap-6 md:grid-cols-2 lg:grid-cols-4">
         {/* Tile 1 — DIY */}
         <Tile
           featured
+          featuredLabel={t("audience.mostPopular")}
           icon={<Hammer className="size-7" />}
-          title="I Want to Do It Myself"
-          subtitle="AI plans your project, compares prices across stores, and finds tool rentals nearby"
+          title={t("audience.diy.title")}
+          subtitle={t("audience.diy.subtitle")}
           bullets={[
             {
               icon: <Camera className="size-4" />,
-              text: "Upload photos → get an instant material list",
+              text: t("audience.diy.bullet1"),
             },
             {
               icon: <DollarSign className="size-4" />,
-              text: "AI finds the best price across Home Depot, Lowe's, Amazon & more",
+              text: t("audience.diy.bullet2"),
             },
             {
               icon: <Wrench className="size-4" />,
-              text: "Find tool rentals nearby from commercial sources",
+              text: t("audience.diy.bullet3"),
             },
             {
               icon: <BookOpen className="size-4" />,
-              text: "Get step-by-step AI guidance",
+              text: t("audience.diy.bullet4"),
             },
           ]}
-          ctaLabel="Start Planning"
+          ctaLabel={t("audience.diy.cta")}
           ctaHref="/plan"
           ctaVariant="default"
         />
@@ -134,27 +142,27 @@ export function AudienceTiles() {
         {/* Tile 2 — Homeowner hiring */}
         <Tile
           icon={<Home className="size-7" />}
-          title="I Need a Contractor"
-          subtitle="Verified pros you can trust. Payments protected by escrow."
+          title={t("audience.homeowner.title")}
+          subtitle={t("audience.homeowner.subtitle")}
           bullets={[
             {
               icon: <ShieldCheck className="size-4" />,
-              text: "Contractors can earn Verified badges (ID + background check)",
+              text: t("audience.homeowner.bullet1"),
             },
             {
               icon: <Banknote className="size-4" />,
-              text: "Zero hidden fees",
+              text: t("audience.homeowner.bullet2"),
             },
             {
               icon: <CheckCircle2 className="size-4" />,
-              text: "Payments held in escrow",
+              text: t("audience.homeowner.bullet3"),
             },
             {
               icon: <BarChart3 className="size-4" />,
-              text: "Compare bids side-by-side",
+              text: t("audience.homeowner.bullet4"),
             },
           ]}
-          ctaLabel="Find a Pro"
+          ctaLabel={t("audience.homeowner.cta")}
           ctaHref="/contractors"
           ctaVariant="outline"
         />
@@ -162,27 +170,27 @@ export function AudienceTiles() {
         {/* Tile 3 — Contractor */}
         <Tile
           icon={<HardHat className="size-7" />}
-          title="I'm a Professional"
-          subtitle="Get real jobs. No lead fees. Get paid through secure escrow."
+          title={t("audience.contractor.title")}
+          subtitle={t("audience.contractor.subtitle")}
           bullets={[
             {
               icon: <Zap className="size-4" />,
-              text: "Zero lead fees",
+              text: t("audience.contractor.bullet1"),
             },
             {
               icon: <ListChecks className="size-4" />,
-              text: "Pre-scoped AI projects",
+              text: t("audience.contractor.bullet2"),
             },
             {
               icon: <Milestone className="size-4" />,
-              text: "Milestone-based payments",
+              text: t("audience.contractor.bullet3"),
             },
             {
               icon: <DollarSign className="size-4" />,
-              text: "Earn extra income verifying DIY material lists",
+              text: t("audience.contractor.bullet4"),
             },
           ]}
-          ctaLabel="Join as a Pro"
+          ctaLabel={t("audience.contractor.cta")}
           ctaHref="/for-contractors"
           ctaVariant="outline"
         />
@@ -190,27 +198,27 @@ export function AudienceTiles() {
         {/* Tile 4 — Interior Designer */}
         <Tile
           icon={<Palette className="size-7" />}
-          title="I'm a Designer"
-          subtitle="Sell your design inspiration and earn from your creative eye."
+          title={t("audience.designer.title")}
+          subtitle={t("audience.designer.subtitle")}
           bullets={[
             {
               icon: <Upload className="size-4" />,
-              text: "Upload room designs and mood boards",
+              text: t("audience.designer.bullet1"),
             },
             {
               icon: <DollarSign className="size-4" />,
-              text: "Earn from design purchases and commissions",
+              text: t("audience.designer.bullet2"),
             },
             {
               icon: <Star className="size-4" />,
-              text: "Get featured in our curated gallery",
+              text: t("audience.designer.bullet3"),
             },
             {
               icon: <TrendingUp className="size-4" />,
-              text: "Build your brand and grow your audience",
+              text: t("audience.designer.bullet4"),
             },
           ]}
-          ctaLabel="Start Selling Designs"
+          ctaLabel={t("audience.designer.cta")}
           ctaHref="/dashboard/designer"
           ctaVariant="outline"
         />

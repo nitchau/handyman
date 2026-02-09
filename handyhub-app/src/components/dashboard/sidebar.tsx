@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { Home, LogOut } from "lucide-react";
 import { useClerk, useUser } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
-import { DASHBOARD_NAV } from "@/lib/constants";
+import { DASHBOARD_NAV, type NavLink } from "@/lib/constants";
 import { getIcon } from "@/lib/get-icon";
 import { useUserStore } from "@/stores/user-store";
 
@@ -40,16 +40,25 @@ export function Sidebar() {
       {/* Nav links */}
       <nav className="flex-1 overflow-y-auto px-3 py-4">
         <ul className="space-y-1">
-          {navItems.map((item) => {
-            const Icon = getIcon(item.icon);
+          {navItems.map((item, idx) => {
+            if ("type" in item) {
+              return (
+                <li key={`divider-${idx}`} className="py-2">
+                  <hr className="border-border" />
+                </li>
+              );
+            }
+
+            const link = item as NavLink;
+            const Icon = getIcon(link.icon);
             const isActive =
-              pathname === item.href ||
-              (item.href !== "/dashboard" && pathname.startsWith(item.href));
+              pathname === link.href ||
+              (link.href !== "/dashboard" && pathname.startsWith(link.href));
 
             return (
-              <li key={item.href}>
+              <li key={link.href}>
                 <Link
-                  href={item.href}
+                  href={link.href}
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                     isActive
@@ -58,7 +67,7 @@ export function Sidebar() {
                   )}
                 >
                   <Icon className="size-4 shrink-0" />
-                  {item.label}
+                  {link.label}
                 </Link>
               </li>
             );

@@ -1,28 +1,32 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/lib/i18n/language-context";
 
 export function Hero() {
+  const { t } = useTranslation();
+
   return (
     <section className="relative overflow-hidden px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-32">
       <div className="mx-auto max-w-4xl text-center relative z-10">
         <div className="mb-8 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-primary">
           <span className="text-xs font-bold uppercase tracking-widest">
-            New: AI Design Assistant
+            {t("hero.badge")}
           </span>
         </div>
         <h1 className="text-5xl font-black leading-[1.1] tracking-tight text-slate-900 md:text-7xl">
-          Every Home Project{" "}
+          {t("hero.title1")}{" "}
           <br />
-          <span className="text-primary">Starts Here</span>
+          <span className="text-primary">{t("hero.title2")}</span>
         </h1>
         <p className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-slate-600 md:text-xl">
-          Simplifying home improvement from design to build with expert
-          guidance, quality resources, and verified local professionals.
+          {t("hero.subtitle")}
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Link href="/plan">
             <Button size="lg" className="px-10 py-4 text-lg font-bold shadow-xl shadow-primary/30">
-              Start Your Project
+              {t("hero.startProject")}
             </Button>
           </Link>
           <Link href="/designs">
@@ -31,7 +35,7 @@ export function Hero() {
               size="lg"
               className="px-10 py-4 text-lg font-bold"
             >
-              View Inspiration
+              {t("hero.viewInspiration")}
             </Button>
           </Link>
         </div>

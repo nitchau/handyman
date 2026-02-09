@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/lib/i18n/language-context";
 
 const FEATURED_PHOTOS = [
   "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=400&h=300&fit=crop",
@@ -25,6 +26,7 @@ const DESIGNER_AVATARS = [
 
 export function InspirationBanner() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -42,23 +44,21 @@ export function InspirationBanner() {
           {/* Left — Copy */}
           <div>
             <h2 className="mb-4 text-3xl font-extrabold leading-tight text-slate-900 md:text-4xl">
-              Need Design Inspiration?
+              {t("inspiration.title")}
             </h2>
             <p className="mb-8 max-w-lg text-base leading-relaxed text-slate-600">
-              Browse stunning room designs by professional and community
-              designers. See the exact materials used. Turn any design into a
-              DIY project.
+              {t("inspiration.subtitle")}
             </p>
 
             <div className="mb-8 flex flex-wrap gap-3">
               <Link href="/designs">
                 <Button size="lg" className="gap-2 px-6 font-bold shadow-lg shadow-primary/20">
-                  Explore Designs <ArrowRight className="size-4" />
+                  {t("inspiration.explore")} <ArrowRight className="size-4" />
                 </Button>
               </Link>
               <Link href="/sign-up?role=designer">
                 <Button variant="outline" size="lg" className="px-6 font-bold">
-                  Join as a Designer
+                  {t("inspiration.joinDesigner")}
                 </Button>
               </Link>
             </div>
@@ -78,7 +78,10 @@ export function InspirationBanner() {
                 ))}
               </div>
               <p className="text-sm text-slate-500">
-                Trusted by <span className="font-semibold text-slate-700">50+ designers</span>
+                {t("inspiration.trustedBy")}{" "}
+                <span className="font-semibold text-slate-700">
+                  {t("inspiration.designerCount")}
+                </span>
               </p>
             </div>
           </div>
