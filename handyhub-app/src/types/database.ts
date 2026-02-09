@@ -85,6 +85,18 @@ export enum OrderStatus {
   CANCELLED = "cancelled",
 }
 
+export enum DesignerOrderStatus {
+  REQUESTED = "requested",
+  ACCEPTED = "accepted",
+  IN_PROGRESS = "in_progress",
+  REVISION_REQUESTED = "revision_requested",
+  DELIVERED = "delivered",
+  COMPLETED = "completed",
+  DISPUTED = "disputed",
+  CANCELLED = "cancelled",
+  REFUNDED = "refunded",
+}
+
 export enum VerificationTier {
   NEW = "new",
   ID_VERIFIED = "id_verified",
@@ -491,6 +503,31 @@ export interface DesignerOrder {
   status: OrderStatus;
   due_date: string;
   amount: number;
+}
+
+export interface DesignerOrderRecord {
+  id: string;
+  service_id: string;
+  designer_id: string;
+  client_id: string;
+  status: DesignerOrderStatus;
+  price_agreed: number;
+  platform_fee: number;
+  designer_payout: number;
+  client_notes: string;
+  client_photos: string[];
+  room_dimensions: { length: number; width: number; height: number } | null;
+  deliverables: string[] | null;
+  revision_count: number;
+  max_revisions: number;
+  rating: number | null;
+  review_text: string | null;
+  linked_bom_id: string | null;
+  linked_project_id: string | null;
+  stripe_payment_intent_id: string | null;
+  completed_at: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface DesignerStatCard {
