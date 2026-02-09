@@ -1,32 +1,108 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+const FEATURED_PHOTOS = [
+  "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=400&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=400&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=400&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1600566753086-00f18f6b0896?w=400&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1617806118233-18e1de247200?w=400&h=300&fit=crop",
+];
+
+const DESIGNER_AVATARS = [
+  "https://i.pravatar.cc/40?u=sarah",
+  "https://i.pravatar.cc/40?u=mike",
+  "https://i.pravatar.cc/40?u=studionook",
+  "https://i.pravatar.cc/40?u=amy",
+  "https://i.pravatar.cc/40?u=designer5",
+];
+
 export function InspirationBanner() {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % (FEATURED_PHOTOS.length - 2));
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const visiblePhotos = FEATURED_PHOTOS.slice(activeIndex, activeIndex + 3);
+
   return (
     <section className="px-4 py-12 sm:px-6 lg:px-8">
-      <div className="relative mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-primary/5 p-8 md:p-16">
-        <div className="relative z-10 max-w-lg">
-          <h2 className="mb-6 text-3xl font-black leading-tight text-slate-900 md:text-5xl">
-            Get Inspired for Your
-            <br />
-            Next Project
-          </h2>
-          <p className="mb-10 text-lg leading-relaxed text-slate-600">
-            Explore thousands of curated designs from our community. Find the
-            aesthetic that fits your lifestyle and start planning with
-            confidence.
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <Link href="/designs">
-              <Button size="lg" className="px-8 font-bold shadow-lg shadow-primary/20">
-                Browse Gallery
-              </Button>
-            </Link>
-            <Link href="/plan">
-              <Button variant="outline" size="lg" className="px-8 font-bold">
-                Start a Project
-              </Button>
-            </Link>
+      <div className="mx-auto max-w-7xl rounded-[2rem] bg-emerald-50 p-8 md:p-14">
+        <div className="grid items-center gap-10 lg:grid-cols-2">
+          {/* Left — Copy */}
+          <div>
+            <h2 className="mb-4 text-3xl font-extrabold leading-tight text-slate-900 md:text-4xl">
+              Need Design Inspiration?
+            </h2>
+            <p className="mb-8 max-w-lg text-base leading-relaxed text-slate-600">
+              Browse stunning room designs by professional and community
+              designers. See the exact materials used. Turn any design into a
+              DIY project.
+            </p>
+
+            <div className="mb-8 flex flex-wrap gap-3">
+              <Link href="/designs">
+                <Button size="lg" className="gap-2 px-6 font-bold shadow-lg shadow-primary/20">
+                  Explore Designs <ArrowRight className="size-4" />
+                </Button>
+              </Link>
+              <Link href="/sign-up?role=designer">
+                <Button variant="outline" size="lg" className="px-6 font-bold">
+                  Join as a Designer
+                </Button>
+              </Link>
+            </div>
+
+            {/* Trust line */}
+            <div className="flex items-center gap-3">
+              <div className="flex -space-x-2">
+                {DESIGNER_AVATARS.map((src, i) => (
+                  <Image
+                    key={i}
+                    src={src}
+                    alt=""
+                    width={32}
+                    height={32}
+                    className="size-8 rounded-full border-2 border-white object-cover"
+                  />
+                ))}
+              </div>
+              <p className="text-sm text-slate-500">
+                Trusted by <span className="font-semibold text-slate-700">50+ designers</span>
+              </p>
+            </div>
+          </div>
+
+          {/* Right — Mini preview cards */}
+          <div className="flex justify-center gap-3 lg:justify-end">
+            {visiblePhotos.map((src, i) => (
+              <div
+                key={`${activeIndex}-${i}`}
+                className={`overflow-hidden rounded-xl shadow-md transition-all duration-500 ${
+                  i === 1
+                    ? "w-36 scale-105 sm:w-44"
+                    : "w-28 opacity-80 sm:w-36"
+                }`}
+              >
+                <Image
+                  src={src}
+                  alt="Featured design"
+                  width={180}
+                  height={240}
+                  className="h-48 w-full object-cover sm:h-56"
+                />
+              </div>
+            ))}
           </div>
         </div>
       </div>
