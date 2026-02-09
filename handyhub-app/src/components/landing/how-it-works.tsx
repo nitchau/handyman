@@ -57,9 +57,9 @@ export function HowItWorks() {
                 className="group flex flex-col items-center text-center"
               >
                 <div
-                  className={`mb-4 flex size-12 items-center justify-center rounded-full border-4 border-white shadow-sm transition-transform group-hover:scale-110 ${
+                  className={`mb-4 flex size-12 items-center justify-center rounded-full shadow-sm transition-transform group-hover:scale-110 ${
                     step.active
-                      ? "bg-emerald-50 text-primary"
+                      ? "border-2 border-primary bg-emerald-50 text-primary"
                       : "border-2 border-emerald-100 bg-white text-slate-400 group-hover:border-primary group-hover:text-primary"
                   }`}
                 >
