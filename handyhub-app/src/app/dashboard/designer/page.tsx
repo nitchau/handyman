@@ -1,13 +1,16 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Eye, Heart, TrendingUp, ClipboardList, DollarSign, MoreHorizontal, Plus, BarChart3, Pencil, ShoppingCart } from "lucide-react";
+import { Eye, Heart, TrendingUp, ClipboardList, DollarSign, MoreHorizontal, Plus, BarChart3, Pencil, ShoppingCart, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import type { DesignerStatCard, DesignerOrder, TopDesign } from "@/types/database";
 import { OrderStatus } from "@/types/database";
-import { designerStats, designerOrders, topDesigns } from "@/data/gallery-data";
+
+const DESIGNER_ID = "00000000-0000-0000-0000-00000000dd01"; // TODO: use auth
 
 const statusStyles: Record<string, { bg: string; dot: string; label: string }> = {
   [OrderStatus.IN_PROGRESS]: { bg: "bg-emerald-100 text-emerald-800", dot: "bg-emerald-500", label: "In Progress" },
@@ -16,6 +19,9 @@ const statusStyles: Record<string, { bg: string; dot: string; label: string }> =
   [OrderStatus.NEW]: { bg: "bg-slate-100 text-slate-800", dot: "bg-slate-500", label: "New" },
   [OrderStatus.COMPLETED]: { bg: "bg-slate-100 text-slate-600", dot: "bg-slate-400", label: "Completed" },
   [OrderStatus.CANCELLED]: { bg: "bg-red-100 text-red-800", dot: "bg-red-500", label: "Cancelled" },
+  requested: { bg: "bg-blue-100 text-blue-800", dot: "bg-blue-500", label: "Requested" },
+  accepted: { bg: "bg-emerald-100 text-emerald-800", dot: "bg-emerald-500", label: "Accepted" },
+  delivered: { bg: "bg-purple-100 text-purple-800", dot: "bg-purple-500", label: "Delivered" },
 };
 
 const iconMap: Record<string, React.ElementType> = {
@@ -26,17 +32,48 @@ const iconMap: Record<string, React.ElementType> = {
 };
 
 export default function DesignerDashboardPage() {
+  const [designerName, setDesignerName] = useState("Designer");
+  const [stats, setStats] = useState<DesignerStatCard[]>([]);
+  const [orders, setOrders] = useState<DesignerOrder[]>([]);
+  const [topDesigns, setTopDesigns] = useState<TopDesign[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await fetch(`/api/designer/dashboard?designer_id=${DESIGNER_ID}`);
+        if (!res.ok) return;
+        const { data } = await res.json();
+        setDesignerName(data.designer_name ?? "Designer");
+        setStats(data.stats ?? []);
+        setOrders(data.orders ?? []);
+        setTopDesigns(data.topDesigns ?? []);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <Loader2 className="size-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       {/* Welcome */}
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">Welcome back, Sarah</h2>
+        <h2 className="text-2xl font-bold text-slate-900">Welcome back, {designerName.split(" ")[0]}</h2>
         <p className="text-slate-500">Here is what is happening with your design studio today.</p>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {designerStats.map((stat) => {
+        {stats.map((stat) => {
           const Icon = iconMap[stat.icon] ?? Eye;
           return (
             <Card key={stat.label} className="group hover:border-emerald-200 transition-colors">
@@ -69,38 +106,44 @@ export default function DesignerDashboardPage() {
             View All
           </Link>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-slate-600">
-            <thead className="bg-slate-50 text-xs font-semibold uppercase text-slate-500">
-              <tr>
-                <th className="px-6 py-4">Client</th>
-                <th className="px-6 py-4">Project</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4">Due Date</th>
-                <th className="px-6 py-4 text-right">Amount</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {designerOrders.map((order) => {
-                const style = statusStyles[order.status] ?? statusStyles[OrderStatus.NEW];
-                return (
-                  <tr key={order.id} className="transition-colors hover:bg-slate-50">
-                    <td className="px-6 py-4 font-medium text-slate-900">{order.client_name}</td>
-                    <td className="px-6 py-4">{order.project_title}</td>
-                    <td className="px-6 py-4">
-                      <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium", style.bg)}>
-                        <span className={cn("size-1.5 rounded-full", style.dot)} />
-                        {style.label}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">{order.due_date}</td>
-                    <td className="px-6 py-4 text-right font-medium">${order.amount.toFixed(2)}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        {orders.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm text-slate-600">
+              <thead className="bg-slate-50 text-xs font-semibold uppercase text-slate-500">
+                <tr>
+                  <th className="px-6 py-4">Client</th>
+                  <th className="px-6 py-4">Project</th>
+                  <th className="px-6 py-4">Status</th>
+                  <th className="px-6 py-4">Date</th>
+                  <th className="px-6 py-4 text-right">Amount</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {orders.map((order) => {
+                  const style = statusStyles[order.status] ?? statusStyles[OrderStatus.NEW];
+                  return (
+                    <tr key={order.id} className="transition-colors hover:bg-slate-50">
+                      <td className="px-6 py-4 font-medium text-slate-900">{order.client_name}</td>
+                      <td className="px-6 py-4">{order.project_title}</td>
+                      <td className="px-6 py-4">
+                        <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium", style.bg)}>
+                          <span className={cn("size-1.5 rounded-full", style.dot)} />
+                          {style.label}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">{order.due_date}</td>
+                      <td className="px-6 py-4 text-right font-medium">${order.amount.toFixed(2)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="px-6 py-8 text-center text-sm text-slate-400">
+            No active orders yet. Share your designs to attract clients!
+          </div>
+        )}
       </Card>
 
       {/* Top Performing Designs */}
@@ -111,37 +154,47 @@ export default function DesignerDashboardPage() {
             View All Designs &rarr;
           </Link>
         </div>
-        <div className="grid gap-6 md:grid-cols-3">
-          {topDesigns.map((design) => (
-            <Card key={design.id} className="group overflow-hidden hover:shadow-md transition-shadow">
-              <div className="relative h-48 overflow-hidden bg-slate-200">
-                <Image
-                  src={design.image_url}
-                  alt={design.title}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent p-4 opacity-0 transition-opacity group-hover:opacity-100">
-                  <p className="text-sm font-medium text-white">{design.title}</p>
-                </div>
-              </div>
-              <CardContent className="p-4">
-                <div className="mb-3 flex items-center justify-between">
-                  <div className="flex items-center gap-4 text-sm text-slate-500">
-                    <span className="flex items-center gap-1"><Eye className="size-4" /> {design.views >= 1000 ? `${(design.views / 1000).toFixed(1)}k` : design.views}</span>
-                    <span className="flex items-center gap-1"><Heart className="size-4" /> {design.likes}</span>
+        {topDesigns.length > 0 ? (
+          <div className="grid gap-6 md:grid-cols-3">
+            {topDesigns.map((design) => (
+              <Link key={design.id} href={`/designs/${design.id}`}>
+                <Card className="group overflow-hidden hover:shadow-md transition-shadow">
+                  <div className="relative h-48 overflow-hidden bg-slate-200">
+                    <Image
+                      src={design.image_url}
+                      alt={design.title}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent p-4 opacity-0 transition-opacity group-hover:opacity-100">
+                      <p className="text-sm font-medium text-white">{design.title}</p>
+                    </div>
                   </div>
-                  <button className="text-slate-400 hover:text-primary">
-                    <MoreHorizontal className="size-5" />
-                  </button>
-                </div>
-                <Button variant="outline" className="w-full hover:bg-emerald-50 hover:text-emerald-700">
-                  <BarChart3 className="mr-2 size-4" /> View Analytics
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                  <CardContent className="p-4">
+                    <div className="mb-3 flex items-center justify-between">
+                      <div className="flex items-center gap-4 text-sm text-slate-500">
+                        <span className="flex items-center gap-1"><Eye className="size-4" /> {design.views >= 1000 ? `${(design.views / 1000).toFixed(1)}k` : design.views}</span>
+                        <span className="flex items-center gap-1"><Heart className="size-4" /> {design.likes}</span>
+                      </div>
+                      <button className="text-slate-400 hover:text-primary" onClick={(e) => e.preventDefault()}>
+                        <MoreHorizontal className="size-5" />
+                      </button>
+                    </div>
+                    <Button variant="outline" className="w-full hover:bg-emerald-50 hover:text-emerald-700" onClick={(e) => e.preventDefault()}>
+                      <BarChart3 className="mr-2 size-4" /> View Analytics
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <Card>
+            <CardContent className="py-8 text-center text-sm text-slate-400">
+              Upload your first design to start tracking performance!
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Bottom Row: Quick Actions + Commission Earnings */}
@@ -150,8 +203,12 @@ export default function DesignerDashboardPage() {
         <Card>
           <CardContent className="flex flex-col gap-4 p-6">
             <h3 className="text-lg font-bold text-slate-900">Quick Actions</h3>
-            <Button className="w-full"><Plus className="mr-2 size-4" /> Upload New Idea</Button>
-            <Button variant="outline" className="w-full"><Pencil className="mr-2 size-4" /> Edit Services</Button>
+            <Link href="/dashboard/upload">
+              <Button className="w-full"><Plus className="mr-2 size-4" /> Upload New Idea</Button>
+            </Link>
+            <Link href="/dashboard/services/new">
+              <Button variant="outline" className="w-full"><Pencil className="mr-2 size-4" /> Edit Services</Button>
+            </Link>
             <Button variant="ghost" className="w-full text-slate-500 hover:text-primary">
               <BarChart3 className="mr-2 size-4" /> Full Analytics Report
             </Button>
