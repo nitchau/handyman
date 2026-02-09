@@ -456,6 +456,21 @@ export interface DesignService {
   updated_at: string;
 }
 
+export interface ServiceTemplate {
+  service_type: ServiceType;
+  title: string;
+  description: string;
+  price_min: number;
+  price_max: number;
+  price_type: PriceType;
+  estimated_delivery_days: number;
+  max_revisions: number;
+  is_virtual: boolean;
+  includes_shopping_list: boolean;
+  includes_bom: boolean;
+  audience: string;
+}
+
 export interface DesignReview {
   id: string;
   client_name: string;
