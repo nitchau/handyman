@@ -1,5 +1,9 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
+const isWebhookRoute = createRouteMatcher([
+  '/api/webhooks(.*)',
+]);
+
 const isProtectedRoute = createRouteMatcher([
   '/dashboard(.*)',
   '/api/designer(.*)',
@@ -16,6 +20,9 @@ const isDesignerRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
+  // Webhook routes use their own signature verification — skip Clerk auth
+  if (isWebhookRoute(req)) return;
+
   if (isProtectedRoute(req)) {
     await auth.protect();
   }
