@@ -14,6 +14,22 @@ import { SpaceType } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useTranslation } from "@/lib/i18n/language-context";
+
+const CATEGORY_I18N_MAP: Record<string, string> = {
+  plumbing: "plan.cat.plumbing",
+  electrical: "plan.cat.electrical",
+  painting: "plan.cat.painting",
+  carpentry: "plan.cat.carpentry",
+  roofing: "plan.cat.roofing",
+  landscaping: "plan.cat.landscaping",
+  hvac: "plan.cat.hvac",
+  flooring: "plan.cat.flooring",
+  "kitchen-remodel": "plan.cat.kitchenRemodel",
+  "bathroom-remodel": "plan.cat.bathroomRemodel",
+  "general-handyman": "plan.cat.generalHandyman",
+  cleaning: "plan.cat.cleaning",
+};
 
 const SPACE_TYPES = Object.values(SpaceType).map((v) => ({
   value: v,
@@ -23,6 +39,7 @@ const SPACE_TYPES = Object.values(SpaceType).map((v) => ({
 }));
 
 export function CategoryStep() {
+  const { t } = useTranslation();
   const { projectData, setProjectData, nextStep } = useBomStore();
 
   const {
@@ -51,10 +68,10 @@ export function CategoryStep() {
     <div className="space-y-8">
       <div className="text-center">
         <h2 className="text-2xl font-bold tracking-tight text-slate-800">
-          What are you working on?
+          {t("plan.category.title")}
         </h2>
         <p className="mt-2 text-sm text-slate-500">
-          Select a project category, space type, and describe what you need.
+          {t("plan.category.subtitle")}
         </p>
       </div>
 
@@ -62,7 +79,7 @@ export function CategoryStep() {
         {/* Category grid */}
         <div className="space-y-2">
           <Label>
-            Category <span className="text-red-500">*</span>
+            {t("plan.category.label")} <span className="text-red-500">*</span>
           </Label>
           <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
             {CATEGORIES.map((cat) => {
@@ -96,7 +113,7 @@ export function CategoryStep() {
                     <Icon className="size-5" />
                   </div>
                   <span className="text-xs font-medium text-slate-700">
-                    {cat.name}
+                    {t(CATEGORY_I18N_MAP[cat.slug] ?? cat.slug)}
                   </span>
                 </button>
               );
@@ -113,14 +130,14 @@ export function CategoryStep() {
         {/* Space type */}
         <div className="space-y-2">
           <Label htmlFor="space_type">
-            Space type <span className="text-red-500">*</span>
+            {t("plan.category.spaceType")} <span className="text-red-500">*</span>
           </Label>
           <select
             id="space_type"
             {...register("space_type")}
             className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           >
-            <option value="">Select a space&hellip;</option>
+            <option value="">{t("plan.category.selectSpace")}</option>
             {SPACE_TYPES.map((st) => (
               <option key={st.value} value={st.value}>
                 {st.label}
@@ -137,12 +154,12 @@ export function CategoryStep() {
         {/* Description */}
         <div className="space-y-2">
           <Label htmlFor="description">
-            Describe your project <span className="text-red-500">*</span>
+            {t("plan.category.description")} <span className="text-red-500">*</span>
           </Label>
           <Textarea
             id="description"
             rows={4}
-            placeholder="e.g., I want to replace the vinyl flooring in my bathroom with ceramic tile. The room is about 5x8 feet..."
+            placeholder={t("plan.category.placeholder")}
             {...register("description")}
           />
           {errors.description && (
@@ -154,7 +171,7 @@ export function CategoryStep() {
 
         <div className="flex justify-end pt-2">
           <Button type="submit" size="lg">
-            Continue
+            {t("plan.category.continue")}
           </Button>
         </div>
       </form>

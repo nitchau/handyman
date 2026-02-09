@@ -14,8 +14,10 @@ import { useBomStore } from "@/stores/bom-store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "@/lib/i18n/language-context";
 
 export function MediaStep() {
+  const { t } = useTranslation();
   const {
     mediaFiles,
     mediaPreviews,
@@ -51,7 +53,7 @@ export function MediaStep() {
       const totalCount = mediaFiles.length + arr.length;
 
       if (totalCount > MEDIA_CONSTRAINTS.maxFiles) {
-        setFileError(`Maximum ${MEDIA_CONSTRAINTS.maxFiles} photos allowed`);
+        setFileError(t("plan.media.maxPhotos").replace("{max}", String(MEDIA_CONSTRAINTS.maxFiles)));
         return;
       }
 
@@ -63,14 +65,14 @@ export function MediaStep() {
       );
 
       if (invalid.length > 0) {
-        setFileError("Some files are too large (max 10MB) or wrong format");
+        setFileError(t("plan.media.fileError"));
         return;
       }
 
       setFileError(null);
       addMedia(arr);
     },
-    [mediaFiles.length, addMedia]
+    [mediaFiles.length, addMedia, t]
   );
 
   const handleDrop = useCallback(
@@ -86,7 +88,7 @@ export function MediaStep() {
 
   const handleContinue = () => {
     if (mediaFiles.length < MEDIA_CONSTRAINTS.minFiles) {
-      setFileError("Please add at least 1 photo");
+      setFileError(t("plan.media.minPhotos"));
       return;
     }
 
@@ -105,11 +107,10 @@ export function MediaStep() {
     <div className="space-y-8">
       <div className="text-center">
         <h2 className="text-2xl font-bold tracking-tight text-slate-800">
-          Upload photos of your space
+          {t("plan.media.title")}
         </h2>
         <p className="mt-2 text-sm text-slate-500">
-          Add photos so AI can analyze your project area. More photos = better
-          estimates.
+          {t("plan.media.subtitle")}
         </p>
       </div>
 
@@ -134,10 +135,10 @@ export function MediaStep() {
         </div>
         <div>
           <p className="text-sm font-medium text-slate-700">
-            Drag & drop photos here, or click to browse
+            {t("plan.media.dropzone")}
           </p>
           <p className="mt-1 text-xs text-slate-400">
-            JPG, PNG, WebP, HEIC — max 10MB each, up to 20 photos
+            {t("plan.media.formats")}
           </p>
         </div>
         <input
@@ -196,14 +197,14 @@ export function MediaStep() {
             className="size-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
           />
           <span className="text-sm text-slate-700">
-            I know the room dimensions (optional)
+            {t("plan.media.dimensions")}
           </span>
         </label>
 
         {showDimensions && (
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="length_ft">Length (ft)</Label>
+              <Label htmlFor="length_ft">{t("plan.media.length")}</Label>
               <Input
                 id="length_ft"
                 type="number"
@@ -218,7 +219,7 @@ export function MediaStep() {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="width_ft">Width (ft)</Label>
+              <Label htmlFor="width_ft">{t("plan.media.width")}</Label>
               <Input
                 id="width_ft"
                 type="number"
@@ -233,7 +234,7 @@ export function MediaStep() {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="height_ft">Height (ft)</Label>
+              <Label htmlFor="height_ft">{t("plan.media.height")}</Label>
               <Input
                 id="height_ft"
                 type="number"
@@ -253,10 +254,10 @@ export function MediaStep() {
 
       <div className="flex justify-between pt-2">
         <Button type="button" variant="outline" onClick={prevStep}>
-          Back
+          {t("plan.media.back")}
         </Button>
         <Button type="button" onClick={handleContinue} size="lg">
-          Analyze My Space
+          {t("plan.media.analyze")}
         </Button>
       </div>
     </div>

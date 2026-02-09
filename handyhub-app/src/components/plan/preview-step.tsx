@@ -16,6 +16,7 @@ import type { PreviewConversationTurn } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { useTranslation } from "@/lib/i18n/language-context";
 
 function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -27,6 +28,7 @@ function fileToDataUrl(file: File): Promise<string> {
 }
 
 export function PreviewStep() {
+  const { t } = useTranslation();
   const router = useRouter();
   const {
     projectData,
@@ -166,18 +168,17 @@ export function PreviewStep() {
       <div className="space-y-8">
         <div className="text-center">
           <h2 className="text-2xl font-bold tracking-tight text-slate-800">
-            Creating visualization
+            {t("plan.preview.generatingTitle")}
           </h2>
           <p className="mt-2 text-sm text-slate-500">
-            Our AI is generating a photorealistic preview of your completed
-            project.
+            {t("plan.preview.generatingSubtitle")}
           </p>
         </div>
 
         <div className="flex flex-col items-center gap-6 py-12">
           <Loader2 className="size-12 animate-spin text-emerald-500" />
           <p className="text-sm font-medium text-slate-600">
-            This may take a minute...
+            {t("plan.preview.wait")}
           </p>
         </div>
       </div>
@@ -190,11 +191,10 @@ export function PreviewStep() {
       <div className="space-y-8">
         <div className="text-center">
           <h2 className="text-2xl font-bold tracking-tight text-slate-800">
-            Preview failed
+            {t("plan.preview.failedTitle")}
           </h2>
           <p className="mt-2 text-sm text-slate-500">
-            We couldn&apos;t generate a visualization. You can try again or skip
-            to your plan.
+            {t("plan.preview.failedSubtitle")}
           </p>
         </div>
 
@@ -215,11 +215,11 @@ export function PreviewStep() {
               className="gap-2"
             >
               <RotateCcw className="size-4" />
-              Try Again
+              {t("plan.preview.tryAgain")}
             </Button>
             <Button onClick={handleContinue} variant="outline" className="gap-2">
               <SkipForward className="size-4" />
-              Skip to Plan
+              {t("plan.preview.skipToPlan")}
             </Button>
           </div>
         </div>
@@ -232,11 +232,10 @@ export function PreviewStep() {
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold tracking-tight text-slate-800">
-          Project preview
+          {t("plan.preview.title")}
         </h2>
         <p className="mt-2 text-sm text-slate-500">
-          Here&apos;s what your completed project could look like. Refine with
-          feedback or continue to your plan.
+          {t("plan.preview.subtitle")}
         </p>
       </div>
 
@@ -260,7 +259,7 @@ export function PreviewStep() {
 
       <div className="mx-auto flex max-w-2xl gap-2">
         <Textarea
-          placeholder="Describe changes (e.g. &quot;lighter wall colors&quot;, &quot;add wooden flooring&quot;)..."
+          placeholder={t("plan.preview.feedbackPlaceholder")}
           value={feedback}
           onChange={(e) => setFeedback(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -284,10 +283,10 @@ export function PreviewStep() {
           className="gap-2"
         >
           <ArrowLeft className="size-4" />
-          Back
+          {t("plan.preview.back")}
         </Button>
         <Button onClick={handleContinue} className="gap-2">
-          Continue to Plan
+          {t("plan.preview.continueToPlan")}
           <ArrowRight className="size-4" />
         </Button>
       </div>

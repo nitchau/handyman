@@ -6,16 +6,19 @@ import { useBomStore } from "@/stores/bom-store";
 import { AIAnalysisStatus } from "@/types";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-
-const ANALYSIS_MESSAGES = [
-  "Uploading your photos...",
-  "Analyzing room dimensions...",
-  "Identifying materials needed...",
-  "Comparing prices across retailers...",
-  "Generating your project plan...",
-];
+import { useTranslation } from "@/lib/i18n/language-context";
 
 export function AnalysisStep() {
+  const { t } = useTranslation();
+
+  const ANALYSIS_MESSAGES = [
+    t("plan.analysis.msg1"),
+    t("plan.analysis.msg2"),
+    t("plan.analysis.msg3"),
+    t("plan.analysis.msg4"),
+    t("plan.analysis.msg5"),
+  ];
+
   const {
     projectData,
     mediaFiles,
@@ -99,6 +102,7 @@ export function AnalysisStep() {
       clearInterval(messageInterval);
       clearInterval(progressInterval);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     retryCount,
     projectData,
@@ -116,10 +120,10 @@ export function AnalysisStep() {
       <div className="space-y-8">
         <div className="text-center">
           <h2 className="text-2xl font-bold tracking-tight text-slate-800">
-            Analysis failed
+            {t("plan.analysis.failedTitle")}
           </h2>
           <p className="mt-2 text-sm text-slate-500">
-            We couldn&apos;t generate your project plan. Please try again.
+            {t("plan.analysis.failedSubtitle")}
           </p>
         </div>
 
@@ -130,7 +134,7 @@ export function AnalysisStep() {
 
           <Button onClick={handleRetry} variant="outline" className="gap-2">
             <RotateCcw className="size-4" />
-            Try Again
+            {t("plan.analysis.tryAgain")}
           </Button>
         </div>
       </div>
@@ -142,11 +146,10 @@ export function AnalysisStep() {
     <div className="space-y-8">
       <div className="text-center">
         <h2 className="text-2xl font-bold tracking-tight text-slate-800">
-          Analyzing your space
+          {t("plan.analysis.title")}
         </h2>
         <p className="mt-2 text-sm text-slate-500">
-          Our AI is reviewing your photos and generating a detailed project
-          plan.
+          {t("plan.analysis.subtitle")}
         </p>
       </div>
 
