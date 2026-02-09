@@ -3,16 +3,27 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, LogOut } from "lucide-react";
+import { useClerk, useUser } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { DASHBOARD_NAV } from "@/lib/constants";
 import { getIcon } from "@/lib/get-icon";
-
-// Phase 1: hardcoded role — Phase 2 will read from Clerk/user store
-const MOCK_ROLE = "diy_user";
+import { useUserStore } from "@/stores/user-store";
 
 export function Sidebar() {
   const pathname = usePathname();
-  const navItems = DASHBOARD_NAV[MOCK_ROLE] ?? [];
+  const { signOut } = useClerk();
+  const { user: clerkUser } = useUser();
+
+  // Read role from user store (set during onboarding / profile sync)
+  const storeRole = useUserStore((s) => s.profile?.role);
+
+  // Fallback: read from Clerk publicMetadata, then default to diy_user
+  const role =
+    storeRole ??
+    (clerkUser?.publicMetadata?.role as string | undefined) ??
+    "diy_user";
+
+  const navItems = DASHBOARD_NAV[role] ?? DASHBOARD_NAV.diy_user;
 
   return (
     <aside className="flex h-screen w-60 flex-col border-r border-border bg-white">
@@ -55,9 +66,12 @@ export function Sidebar() {
         </ul>
       </nav>
 
-      {/* Bottom sign-out (placeholder) */}
+      {/* Sign out */}
       <div className="border-t border-border p-3">
-        <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900">
+        <button
+          onClick={() => signOut({ redirectUrl: "/" })}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+        >
           <LogOut className="size-4" />
           Sign Out
         </button>

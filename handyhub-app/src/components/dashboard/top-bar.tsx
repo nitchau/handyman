@@ -1,9 +1,9 @@
 "use client";
 
 import { Bell, Search } from "lucide-react";
+import { UserButton } from "@clerk/nextjs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export function TopBar() {
   return (
@@ -23,11 +23,12 @@ export function TopBar() {
           <Bell className="size-4" />
           <span className="sr-only">Notifications</span>
         </Button>
-        <Avatar className="size-8">
-          <AvatarFallback className="bg-primary/10 text-xs font-medium text-primary">
-            U
-          </AvatarFallback>
-        </Avatar>
+        <UserButton
+          afterSignOutUrl="/"
+          appearance={{
+            elements: { avatarBox: "size-8" },
+          }}
+        />
       </div>
     </header>
   );

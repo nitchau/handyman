@@ -1,6 +1,6 @@
 "use client";
 
-import { Hammer, Home, HardHat } from "lucide-react";
+import { Hammer, Home, HardHat, Palette } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ROLES } from "@/lib/constants";
 import { useOnboardingStore } from "@/stores/onboarding-store";
@@ -11,6 +11,7 @@ const ROLE_OPTIONS: { key: UserRole; icon: typeof Hammer }[] = [
   { key: "diy_user" as UserRole, icon: Hammer },
   { key: "homeowner" as UserRole, icon: Home },
   { key: "contractor" as UserRole, icon: HardHat },
+  { key: "designer" as UserRole, icon: Palette },
 ];
 
 export function RoleStep() {
@@ -27,7 +28,7 @@ export function RoleStep() {
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
         {ROLE_OPTIONS.map(({ key, icon: Icon }) => {
           const role = ROLES[key as keyof typeof ROLES];
           const isSelected = selectedRole === key;
