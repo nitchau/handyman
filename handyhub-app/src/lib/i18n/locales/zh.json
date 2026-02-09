@@ -114,6 +114,7 @@
   "designDetail.priceCompare": "已比较4家零售商的价格",
   "designDetail.shopAll": "购买所有商品",
   "designDetail.generateList": "生成完整材料清单",
+  "designDetail.turnIntoProject": "将此变为我的项目",
   "designDetail.noProducts": "该设计的产品标签即将推出。",
   "designDetail.workWith": "与",
   "designDetail.bookNow": "立即预订",
@@ -280,6 +281,11 @@
   "plan.analysis.failedTitle": "分析失败",
   "plan.analysis.failedSubtitle": "我们无法生成你的项目计划。请重试。",
   "plan.analysis.tryAgain": "重试",
+
+  "plan.designRef.badge": "基于设计方案",
+  "plan.designRef.by": "设计师",
+  "plan.media.designRefHint": "参考设计照片已自动包含。上传您的房间照片以获得准确的尺寸和数量。",
+  "plan.analysis.designRefMsg": "正在匹配参考设计的材料...",
 
   "plan.preview.generatingTitle": "正在创建可视化",
   "plan.preview.generatingSubtitle": "我们的AI正在生成你完成项目的逼真预览。",

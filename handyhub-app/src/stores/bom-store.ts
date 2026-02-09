@@ -7,6 +7,27 @@ import type {
   RoomDimensions,
 } from "@/types";
 
+export interface DesignReference {
+  designId: string;
+  designTitle: string;
+  designStyle: string;
+  roomType: string;
+  budgetTier: string;
+  estimatedCost: number | null;
+  primaryPhotoUrl: string;
+  mediaUrls: string[];
+  designerId: string;
+  designerName: string;
+  productTags: Array<{
+    productName: string;
+    productBrand: string | null;
+    productCategory: string;
+    estimatedPrice: number;
+    retailerName: string | null;
+    quantityNeeded: string | null;
+  }>;
+}
+
 interface BomState {
   currentStep: number;
   projectData: {
@@ -25,6 +46,7 @@ interface BomState {
   previewHistory: PreviewConversationTurn[];
   previewStatus: PreviewStatus;
   previewError: string | null;
+  designReference: DesignReference | null;
 
   setStep: (step: number) => void;
   nextStep: () => void;
@@ -42,6 +64,7 @@ interface BomState {
   setPreviewStatus: (status: PreviewStatus) => void;
   setPreviewError: (error: string | null) => void;
   resetPreview: () => void;
+  setDesignReference: (ref: DesignReference | null) => void;
   reset: () => void;
 }
 
@@ -65,6 +88,7 @@ export const useBomStore = create<BomState>((set, get) => ({
   previewHistory: [],
   previewStatus: "idle" as PreviewStatus,
   previewError: null,
+  designReference: null,
 
   setStep: (step) => set({ currentStep: step }),
   nextStep: () => set({ currentStep: get().currentStep + 1 }),
@@ -112,6 +136,8 @@ export const useBomStore = create<BomState>((set, get) => ({
       previewError: null,
     }),
 
+  setDesignReference: (ref) => set({ designReference: ref }),
+
   reset: () => {
     // Revoke all object URLs before resetting
     get().mediaPreviews.forEach((url) => URL.revokeObjectURL(url));
@@ -129,6 +155,7 @@ export const useBomStore = create<BomState>((set, get) => ({
       previewHistory: [],
       previewStatus: "idle" as PreviewStatus,
       previewError: null,
+      designReference: null,
     });
   },
 }));

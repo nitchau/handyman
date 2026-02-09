@@ -114,6 +114,7 @@
   "designDetail.priceCompare": "Preços comparados em 4 lojas",
   "designDetail.shopAll": "Comprar Todos os Itens",
   "designDetail.generateList": "Gerar Lista Completa de Materiais",
+  "designDetail.turnIntoProject": "Transformar no Meu Projeto",
   "designDetail.noProducts": "Etiquetas de produtos em breve para este design.",
   "designDetail.workWith": "Trabalhe com",
   "designDetail.bookNow": "Reservar Agora",
@@ -280,6 +281,11 @@
   "plan.analysis.failedTitle": "Análise falhou",
   "plan.analysis.failedSubtitle": "Não conseguimos gerar seu plano de projeto. Por favor tente novamente.",
   "plan.analysis.tryAgain": "Tentar Novamente",
+
+  "plan.designRef.badge": "Baseado em um design",
+  "plan.designRef.by": "por",
+  "plan.media.designRefHint": "As fotos do design de referência são incluídas automaticamente. Envie fotos do SEU cômodo para medições precisas.",
+  "plan.analysis.designRefMsg": "Combinando materiais com o design de referência...",
 
   "plan.preview.generatingTitle": "Criando visualização",
   "plan.preview.generatingSubtitle": "Nossa IA está gerando uma pré-visualização fotorrealista do seu projeto concluído.",

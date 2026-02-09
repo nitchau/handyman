@@ -1,16 +1,64 @@
+interface DesignReferencePrompt {
+  designTitle: string;
+  designStyle: string;
+  budgetTier: string;
+  estimatedCost: number | null;
+  productTags: Array<{
+    productName: string;
+    productBrand: string | null;
+    productCategory: string;
+    estimatedPrice: number;
+    retailerName: string | null;
+    quantityNeeded: string | null;
+  }>;
+}
+
 interface BomPromptParams {
   category_slug: string;
   space_type: string;
   description: string;
   dimensions: { length_ft: number; width_ft: number; height_ft: number } | null;
+  designReference?: DesignReferencePrompt | null;
 }
 
 export function buildBomPrompt(params: BomPromptParams): string {
-  const { category_slug, space_type, description, dimensions } = params;
+  const { category_slug, space_type, description, dimensions, designReference } = params;
 
   const dimText = dimensions
     ? `Room dimensions: ${dimensions.length_ft}ft L × ${dimensions.width_ft}ft W × ${dimensions.height_ft}ft H (${(dimensions.length_ft * dimensions.width_ft).toFixed(0)} sq ft)`
     : "Room dimensions: not provided — estimate from photos.";
+
+  let designBlock = "";
+  if (designReference) {
+    const costText = designReference.estimatedCost
+      ? `$${designReference.estimatedCost.toLocaleString()}`
+      : "not specified";
+
+    const productLines = designReference.productTags
+      .map((p) => {
+        const brand = p.productBrand ? ` by ${p.productBrand}` : "";
+        const retailer = p.retailerName ? ` from ${p.retailerName}` : "";
+        const qty = p.quantityNeeded ? `, qty: ${p.quantityNeeded}` : "";
+        return `- ${p.productName}${brand} (${p.productCategory}) — ~$${p.estimatedPrice}${retailer}${qty}`;
+      })
+      .join("\n");
+
+    designBlock = `
+
+DESIGN REFERENCE:
+You are generating a BOM to recreate this design: "${designReference.designTitle}" (style: ${designReference.designStyle})
+Budget tier: ${designReference.budgetTier}, estimated cost: ${costText}
+
+PRODUCTS FROM THE REFERENCE DESIGN:
+${productLines || "No specific products listed."}
+
+DESIGN MATCHING INSTRUCTIONS:
+1. Use reference products as PRIMARY guide for material selection.
+2. Match the ${designReference.designStyle} aesthetic in all material choices.
+3. Include listed products with accurate current pricing.
+4. For unlisted products, choose materials matching same style/quality tier.
+5. Size quantities to USER'S room (from their photos), not the reference.`;
+  }
 
   return `You are a professional home improvement estimator with 20+ years of experience.
 Analyze the uploaded photos and generate a detailed Bill of Materials (BOM) for this project.
@@ -20,6 +68,7 @@ PROJECT DETAILS:
 - Space type: ${space_type}
 - Description: ${description}
 - ${dimText}
+${designBlock}
 
 INSTRUCTIONS:
 1. Study the photos carefully to assess the current state of the room/space.

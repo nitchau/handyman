@@ -114,6 +114,7 @@
   "designDetail.priceCompare": "Precios comparados en 4 tiendas",
   "designDetail.shopAll": "Comprar Todos los Artículos",
   "designDetail.generateList": "Generar Lista Completa de Materiales",
+  "designDetail.turnIntoProject": "Convertir en Mi Proyecto",
   "designDetail.noProducts": "Las etiquetas de productos llegarán pronto para este diseño.",
   "designDetail.workWith": "Trabaja con",
   "designDetail.bookNow": "Reservar Ahora",
@@ -280,6 +281,11 @@
   "plan.analysis.failedTitle": "Análisis fallido",
   "plan.analysis.failedSubtitle": "No pudimos generar tu plan de proyecto. Por favor intenta de nuevo.",
   "plan.analysis.tryAgain": "Intentar de Nuevo",
+
+  "plan.designRef.badge": "Basado en un diseño",
+  "plan.designRef.by": "por",
+  "plan.media.designRefHint": "Las fotos del diseño de referencia se incluyen automáticamente. Sube fotos de TU habitación para medidas precisas.",
+  "plan.analysis.designRefMsg": "Combinando materiales con el diseño de referencia...",
 
   "plan.preview.generatingTitle": "Creando visualización",
   "plan.preview.generatingSubtitle": "Nuestra IA está generando una vista previa fotorrealista de tu proyecto completado.",

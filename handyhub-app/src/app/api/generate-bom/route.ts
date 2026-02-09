@@ -23,6 +23,44 @@ const ALLOWED_TYPES = [
   "image/heif",
 ];
 
+interface DesignReferencePayload {
+  designId: string;
+  designTitle: string;
+  designStyle: string;
+  budgetTier: string;
+  estimatedCost: number | null;
+  designerId: string;
+  productTags: Array<{
+    productName: string;
+    productBrand: string | null;
+    productCategory: string;
+    estimatedPrice: number;
+    retailerName: string | null;
+    quantityNeeded: string | null;
+  }>;
+  referencePhotoUrls: string[];
+}
+
+async function fetchImageAsBase64(
+  url: string
+): Promise<{ mimeType: string; data: string } | null> {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10_000);
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeout);
+    if (!res.ok) return null;
+    const contentType = res.headers.get("content-type") ?? "image/jpeg";
+    const buffer = await res.arrayBuffer();
+    return {
+      mimeType: contentType.split(";")[0],
+      data: Buffer.from(buffer).toString("base64"),
+    };
+  } catch {
+    return null;
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
@@ -61,7 +99,18 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Collect images
+    // Parse optional design reference
+    let designReference: DesignReferencePayload | null = null;
+    const designRefRaw = formData.get("designReference");
+    if (designRefRaw && typeof designRefRaw === "string") {
+      try {
+        designReference = JSON.parse(designRefRaw);
+      } catch {
+        // Ignore invalid design reference
+      }
+    }
+
+    // Collect user-uploaded images
     const images: File[] = [];
     for (const [, value] of formData.entries()) {
       if (value instanceof File && ALLOWED_TYPES.includes(value.type)) {
@@ -69,7 +118,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    if (images.length === 0) {
+    // Allow 0 user photos when reference photos exist
+    const hasReferencePhotos =
+      designReference && designReference.referencePhotoUrls.length > 0;
+    if (images.length === 0 && !hasReferencePhotos) {
       return NextResponse.json(
         { error: "At least 1 photo is required" },
         { status: 400 }
@@ -93,8 +145,8 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Convert images to base64 inline data parts for Gemini
-    const imageParts = await Promise.all(
+    // Convert user images to base64 inline data parts for Gemini
+    const userImageParts = await Promise.all(
       images.map(async (img) => {
         const buffer = await img.arrayBuffer();
         const base64 = Buffer.from(buffer).toString("base64");
@@ -107,19 +159,59 @@ export async function POST(req: NextRequest) {
       })
     );
 
+    // Fetch reference design photos (up to 5, with timeout)
+    let refImageParts: { inlineData: { mimeType: string; data: string } }[] = [];
+    if (hasReferencePhotos) {
+      const urls = designReference!.referencePhotoUrls.slice(0, 5);
+      const results = await Promise.allSettled(urls.map(fetchImageAsBase64));
+      refImageParts = results
+        .filter(
+          (r): r is PromiseFulfilledResult<{ mimeType: string; data: string }> =>
+            r.status === "fulfilled" && r.value !== null
+        )
+        .map((r) => ({ inlineData: r.value }));
+    }
+
     // Build prompt
     const prompt = buildBomPrompt({
       category_slug: projectData.category_slug,
       space_type: projectData.space_type,
       description: projectData.description,
       dimensions,
+      designReference: designReference
+        ? {
+            designTitle: designReference.designTitle,
+            designStyle: designReference.designStyle,
+            budgetTier: designReference.budgetTier,
+            estimatedCost: designReference.estimatedCost,
+            productTags: designReference.productTags,
+          }
+        : null,
     });
+
+    // Build content parts with labeled image groups
+    const contentParts: (string | { inlineData: { mimeType: string; data: string } })[] =
+      [prompt];
+
+    if (refImageParts.length > 0) {
+      contentParts.push(
+        "--- REFERENCE DESIGN PHOTOS (target aesthetic) ---"
+      );
+      contentParts.push(...refImageParts);
+    }
+
+    if (userImageParts.length > 0) {
+      contentParts.push(
+        "--- USER'S CURRENT ROOM PHOTOS (use for measurements) ---"
+      );
+      contentParts.push(...userImageParts);
+    }
 
     // Call Gemini
     let geminiResponse;
     try {
       const model = getBomModel();
-      const result = await model.generateContent([prompt, ...imageParts]);
+      const result = await model.generateContent(contentParts);
       geminiResponse = result.response.text();
     } catch (err: unknown) {
       const raw =
@@ -230,6 +322,8 @@ export async function POST(req: NextRequest) {
         verified_at: null,
         notes: null,
       },
+      source_design_id: designReference?.designId ?? null,
+      source_designer_id: designReference?.designerId ?? null,
       created_at: now,
       updated_at: now,
     };

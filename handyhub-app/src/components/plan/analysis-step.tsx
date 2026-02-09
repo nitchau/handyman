@@ -23,6 +23,7 @@ export function AnalysisStep() {
     projectData,
     mediaFiles,
     dimensions,
+    designReference,
     nextStep,
     setAnalysisStatus,
     setResult,
@@ -68,6 +69,21 @@ export function AnalysisStep() {
     for (const file of mediaFiles) {
       formData.append("images", file);
     }
+    if (designReference) {
+      formData.append(
+        "designReference",
+        JSON.stringify({
+          designId: designReference.designId,
+          designTitle: designReference.designTitle,
+          designStyle: designReference.designStyle,
+          budgetTier: designReference.budgetTier,
+          estimatedCost: designReference.estimatedCost,
+          designerId: designReference.designerId,
+          productTags: designReference.productTags,
+          referencePhotoUrls: designReference.mediaUrls,
+        })
+      );
+    }
 
     fetch("/api/generate-bom", {
       method: "POST",
@@ -108,6 +124,7 @@ export function AnalysisStep() {
     projectData,
     mediaFiles,
     dimensions,
+    designReference,
     setAnalysisStatus,
     setResult,
     setError,

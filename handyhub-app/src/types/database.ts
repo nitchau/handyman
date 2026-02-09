@@ -332,6 +332,8 @@ export interface BomProject {
   labor_cost_max: number;
   difficulty: "easy" | "moderate" | "hard";
   verification: BomVerification;
+  source_design_id: string | null;
+  source_designer_id: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -246,6 +246,8 @@ export function getMockBomResult(
       verified_at: null,
       notes: null,
     },
+    source_design_id: null,
+    source_designer_id: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     ...overrides,

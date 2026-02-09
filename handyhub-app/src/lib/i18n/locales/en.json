@@ -114,6 +114,7 @@
   "designDetail.priceCompare": "Prices compared across 4 retailers",
   "designDetail.shopAll": "Shop All Items",
   "designDetail.generateList": "Generate Full Material List",
+  "designDetail.turnIntoProject": "Turn This Into My Project",
   "designDetail.noProducts": "Product tags coming soon for this design.",
   "designDetail.workWith": "Work with",
   "designDetail.bookNow": "Book Now",
@@ -280,6 +281,11 @@
   "plan.analysis.failedTitle": "Analysis failed",
   "plan.analysis.failedSubtitle": "We couldn't generate your project plan. Please try again.",
   "plan.analysis.tryAgain": "Try Again",
+
+  "plan.designRef.badge": "Based on a design",
+  "plan.designRef.by": "by",
+  "plan.media.designRefHint": "Reference design photos included automatically. Upload photos of YOUR room for accurate measurements.",
+  "plan.analysis.designRefMsg": "Matching materials to reference design...",
 
   "plan.preview.generatingTitle": "Creating visualization",
   "plan.preview.generatingSubtitle": "Our AI is generating a photorealistic preview of your completed project.",

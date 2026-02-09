@@ -22,6 +22,7 @@ export function MediaStep() {
     mediaFiles,
     mediaPreviews,
     dimensions,
+    designReference,
     addMedia,
     removeMedia,
     setDimensions,
@@ -87,7 +88,8 @@ export function MediaStep() {
   );
 
   const handleContinue = () => {
-    if (mediaFiles.length < MEDIA_CONSTRAINTS.minFiles) {
+    const minRequired = designReference ? 0 : MEDIA_CONSTRAINTS.minFiles;
+    if (mediaFiles.length < minRequired) {
       setFileError(t("plan.media.minPhotos"));
       return;
     }
@@ -113,6 +115,12 @@ export function MediaStep() {
           {t("plan.media.subtitle")}
         </p>
       </div>
+
+      {designReference && (
+        <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
+          {t("plan.media.designRefHint")}
+        </div>
+      )}
 
       {/* Drop zone */}
       <div

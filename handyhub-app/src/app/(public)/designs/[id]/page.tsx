@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, Bookmark, Share2, ChevronLeft, ChevronRight, ShoppingCart, Loader2 } from "lucide-react";
+import { Heart, Bookmark, Share2, ChevronLeft, ChevronRight, ShoppingCart, Hammer, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -244,9 +244,12 @@ export default function DesignDetailPage({ params }: DesignDetailPageProps) {
                       <Button className="w-full">
                         <ShoppingCart className="mr-2 size-4" /> {t("designDetail.shopAll")}
                       </Button>
-                      <Button variant="outline" className="w-full">
-                        {t("designDetail.generateList")} &rarr;
-                      </Button>
+                      <Link href={`/plan?ref=${design.id}`}>
+                        <Button variant="outline" className="w-full gap-2">
+                          <Hammer className="size-4" />
+                          {t("designDetail.turnIntoProject")}
+                        </Button>
+                      </Link>
                     </div>
                   </>
                 ) : (
