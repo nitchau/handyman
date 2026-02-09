@@ -405,6 +405,19 @@ export interface DesignIdea {
   designer?: DesignerProfile;
 }
 
+export interface DesignIdeaLike {
+  user_id: string;
+  design_idea_id: string;
+  created_at: string;
+}
+
+export interface DesignIdeaSave {
+  user_id: string;
+  design_idea_id: string;
+  collection_name: string;
+  created_at: string;
+}
+
 export interface DesignService {
   id: string;
   designer_id: string;
