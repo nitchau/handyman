@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { supabaseAdmin } from "@/lib/supabase/server";
+import { geocodeAddress } from "@/lib/geocoding";
 
 export async function POST(req: Request) {
   const { userId } = await auth();
@@ -40,9 +41,24 @@ export async function POST(req: Request) {
 
     if (profileError) throw profileError;
 
+    // 1b. Geocode zip code → store lat/lng on user profile
+    let geoLat: number | null = null;
+    let geoLng: number | null = null;
+    if (zip_code) {
+      const geo = await geocodeAddress(zip_code);
+      if (geo) {
+        geoLat = geo.lat;
+        geoLng = geo.lng;
+        await supabaseAdmin
+          .from("users_profile")
+          .update({ latitude: geoLat, longitude: geoLng })
+          .eq("id", profile.id);
+      }
+    }
+
     // 2. If contractor, create contractor profile
     if (role === "contractor" && extra.business_name) {
-      const { error: contractorError } = await supabaseAdmin
+      const { data: contractor, error: contractorError } = await supabaseAdmin
         .from("contractors")
         .upsert(
           {
@@ -55,12 +71,40 @@ export async function POST(req: Request) {
             verification_tier: "new",
             rating_avg: 0,
             review_count: 0,
+            latitude: geoLat,
+            longitude: geoLng,
           },
           { onConflict: "user_id", ignoreDuplicates: false }
-        );
+        )
+        .select()
+        .single();
 
       if (contractorError) {
         console.error("[onboarding] Contractor insert error:", contractorError);
+      }
+
+      // 2b. Insert contractor_skills from selected categories
+      if (contractor && extra.categories?.length) {
+        const { data: catRows } = await supabaseAdmin
+          .from("categories")
+          .select("id, slug")
+          .in("slug", extra.categories);
+
+        if (catRows?.length) {
+          const skills = catRows.map((cat: { id: string }) => ({
+            contractor_id: contractor.id,
+            category_id: cat.id,
+          }));
+          const { error: skillsError } = await supabaseAdmin
+            .from("contractor_skills")
+            .upsert(skills, {
+              onConflict: "contractor_id,category_id",
+              ignoreDuplicates: true,
+            });
+          if (skillsError) {
+            console.error("[onboarding] Skills insert error:", skillsError);
+          }
+        }
       }
     }
 

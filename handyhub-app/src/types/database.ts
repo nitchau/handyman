@@ -131,6 +131,8 @@ export interface UserProfile {
   role: UserRole;
   phone: string | null;
   zip_code: string | null;
+  latitude: number | null;
+  longitude: number | null;
   onboarding_completed: boolean;
   created_at: string;
   updated_at: string;
@@ -578,6 +580,29 @@ export interface BookingFormState {
   styleDislikes: string[];
   budget: number;
   notes: string;
+}
+
+// ── Contractor Search Result ──────────────────────────────────────────
+
+export interface ContractorSearchResult {
+  id: string;
+  user_id: string;
+  business_name: string;
+  bio: string | null;
+  years_experience: number;
+  hourly_rate: number | null;
+  service_radius_miles: number;
+  verification_tier: string;
+  license_number: string | null;
+  insurance_verified: boolean;
+  rating_avg: number;
+  review_count: number;
+  latitude: number | null;
+  longitude: number | null;
+  distance_miles: number;
+  display_name: string;
+  avatar_url: string | null;
+  categories: string[];
 }
 
 // ── Contractor Search / Profile Types ─────────────────────────────────

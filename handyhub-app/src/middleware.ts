@@ -8,6 +8,7 @@ const isPublicApiRoute = createRouteMatcher([
   '/api/designs(.*)',
   '/api/designers(.*)',
   '/api/designs/featured(.*)',
+  '/api/contractors(.*)',
 ]);
 
 const isProtectedRoute = createRouteMatcher([
