@@ -30,6 +30,7 @@ export async function GET(req: NextRequest) {
   const category = params.get("category") || null;
   const minRating = parseFloat(params.get("min_rating") ?? "0");
   const sort = params.get("sort") ?? "distance";
+  const verifiedOnly = params.get("verified_only") === "true";
   const page = parseInt(params.get("page") ?? "1", 10);
   const limit = Math.min(parseInt(params.get("limit") ?? "20", 10), 50);
   const offset = (page - 1) * limit;
@@ -53,8 +54,20 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const results = data ?? [];
-  const totalCount = results.length > 0 ? Number(results[0].total_count) : 0;
+  let results = data ?? [];
+
+  // Filter verified-only client-side (simpler than adding to RPC)
+  if (verifiedOnly) {
+    results = results.filter(
+      (r: Record<string, unknown>) => r.verification_tier !== "new"
+    );
+  }
+
+  const totalCount = verifiedOnly
+    ? results.length
+    : results.length > 0
+      ? Number(results[0].total_count)
+      : 0;
 
   return NextResponse.json({
     results: results.map((r: Record<string, unknown>) => ({

@@ -9,6 +9,7 @@ const isPublicApiRoute = createRouteMatcher([
   '/api/designers(.*)',
   '/api/designs/featured(.*)',
   '/api/contractors(.*)',
+  '/api/geocode(.*)',
 ]);
 
 const isProtectedRoute = createRouteMatcher([
