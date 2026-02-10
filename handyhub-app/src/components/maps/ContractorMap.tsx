@@ -106,17 +106,32 @@ export function ContractorMap({
             <div
               onMouseEnter={() => onMarkerHover?.(c.id)}
               onMouseLeave={() => onMarkerHover?.(null)}
-              className={`
-                flex items-center justify-center rounded-full px-2.5 py-1
-                text-xs font-bold shadow-lg cursor-pointer transition-all duration-150
-                ${
-                  selectedId === c.id
-                    ? "bg-emerald-600 text-white scale-125 z-10 ring-2 ring-emerald-300"
-                    : "bg-white text-slate-900 border border-slate-200 hover:scale-110 hover:shadow-xl"
-                }
-              `}
+              className="relative group"
             >
-              {c.hourlyRate ? `$${c.hourlyRate}` : c.displayName.charAt(0)}
+              {/* Tooltip */}
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-20 pointer-events-none">
+                <div className="whitespace-nowrap rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-medium text-white shadow-lg">
+                  {c.displayName}
+                  {c.hourlyRate != null && (
+                    <span className="ml-1.5 text-emerald-300">${c.hourlyRate}/hr</span>
+                  )}
+                </div>
+                <div className="mx-auto h-0 w-0 border-x-[6px] border-t-[6px] border-x-transparent border-t-slate-900" />
+              </div>
+              {/* Pin */}
+              <div
+                className={`
+                  flex items-center justify-center rounded-full px-2.5 py-1
+                  text-xs font-bold shadow-lg cursor-pointer transition-all duration-150
+                  ${
+                    selectedId === c.id
+                      ? "bg-emerald-600 text-white scale-125 z-10 ring-2 ring-emerald-300"
+                      : "bg-white text-slate-900 border border-slate-200 hover:scale-110 hover:shadow-xl"
+                  }
+                `}
+              >
+                {c.hourlyRate ? `$${c.hourlyRate}` : c.displayName.charAt(0)}
+              </div>
             </div>
           </AdvancedMarker>
         ))}
