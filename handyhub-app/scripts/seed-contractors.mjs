@@ -35,21 +35,56 @@ if (!SUPABASE_URL || !SUPABASE_KEY || !GOOGLE_KEY) {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ── Category → search query mapping ─────────────────────────────────────
-const CATEGORY_QUERIES = [
-  { slug: "plumbing", query: "plumber in Portland OR" },
-  { slug: "electrical", query: "electrician in Portland OR" },
-  { slug: "painting", query: "house painter in Portland OR" },
-  { slug: "carpentry", query: "carpenter in Portland OR" },
-  { slug: "roofing", query: "roofing contractor in Portland OR" },
-  { slug: "landscaping", query: "landscaping company in Portland OR" },
-  { slug: "hvac", query: "HVAC contractor in Portland OR" },
-  { slug: "flooring", query: "flooring installer in Portland OR" },
-  { slug: "kitchen-remodel", query: "kitchen remodeling in Portland OR" },
-  { slug: "bathroom-remodel", query: "bathroom remodeling in Portland OR" },
-  { slug: "general-handyman", query: "handyman in Portland OR" },
-  { slug: "cleaning", query: "house cleaning service in Portland OR" },
+// ── Cities to seed ──────────────────────────────────────────────────────
+// Pass city names as CLI args, or defaults to all cities below.
+// Usage: node scripts/seed-contractors.mjs Seattle Chicago
+//        node scripts/seed-contractors.mjs          (seeds all)
+const ALL_CITIES = [
+  "Portland OR",
+  "Seattle WA",
+  "San Francisco CA",
+  "Los Angeles CA",
+  "Chicago IL",
+  "New York NY",
+  "Austin TX",
+  "Denver CO",
+  "Miami FL",
+  "Atlanta GA",
 ];
+
+const requestedCities = process.argv.slice(2);
+const CITIES =
+  requestedCities.length > 0
+    ? requestedCities.map((c) => {
+        // Match partial input like "Seattle" to "Seattle WA"
+        const match = ALL_CITIES.find((ac) => ac.toLowerCase().startsWith(c.toLowerCase()));
+        return match || c;
+      })
+    : ALL_CITIES;
+
+// ── Category → search query template ────────────────────────────────────
+const CATEGORY_SEARCH_TERMS = [
+  { slug: "plumbing", term: "plumber" },
+  { slug: "electrical", term: "electrician" },
+  { slug: "painting", term: "house painter" },
+  { slug: "carpentry", term: "carpenter" },
+  { slug: "roofing", term: "roofing contractor" },
+  { slug: "landscaping", term: "landscaping company" },
+  { slug: "hvac", term: "HVAC contractor" },
+  { slug: "flooring", term: "flooring installer" },
+  { slug: "kitchen-remodel", term: "kitchen remodeling" },
+  { slug: "bathroom-remodel", term: "bathroom remodeling" },
+  { slug: "general-handyman", term: "handyman" },
+  { slug: "cleaning", term: "house cleaning service" },
+];
+
+// Build queries for each city × category
+const CATEGORY_QUERIES = CITIES.flatMap((city) =>
+  CATEGORY_SEARCH_TERMS.map(({ slug, term }) => ({
+    slug,
+    query: `${term} in ${city}`,
+  }))
+);
 
 const FIELD_MASK =
   "places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.userRatingCount";
@@ -78,12 +113,15 @@ function splitName(displayName) {
   return { first: parts.slice(0, -1).join(" "), last: parts[parts.length - 1] };
 }
 
-function generateBio(businessName, categoryName) {
+function generateBio(businessName, categoryName, address) {
   const years = randomInt(2, 25);
+  // Extract city name from address (e.g. "Portland, OR 97201" → "Portland")
+  const cityMatch = address?.match(/,?\s*([A-Za-z\s]+),\s*[A-Z]{2}/);
+  const city = cityMatch ? cityMatch[1].trim() : "the local";
   const templates = [
-    `${businessName} has been proudly serving the Portland area for over ${years} years, specializing in ${categoryName.toLowerCase()}.`,
+    `${businessName} has been proudly serving the ${city} area for over ${years} years, specializing in ${categoryName.toLowerCase()}.`,
     `With ${years} years of experience in ${categoryName.toLowerCase()}, ${businessName} delivers quality work and exceptional customer service.`,
-    `Portland's trusted ${categoryName.toLowerCase()} professionals. ${businessName} brings ${years} years of expertise to every job.`,
+    `${city}'s trusted ${categoryName.toLowerCase()} professionals. ${businessName} brings ${years} years of expertise to every job.`,
   ];
   return templates[randomInt(0, templates.length - 1)];
 }
@@ -182,6 +220,7 @@ async function main() {
       continue;
     }
 
+    const address = place.formattedAddress || "";
     const clerkId = `places_seed_${placeId}`;
     const { first, last } = splitName(displayName);
     const primaryCategory = categoryMap[categorySlugs[0]]?.name || categorySlugs[0];
@@ -224,7 +263,7 @@ async function main() {
         {
           user_id: userId,
           business_name: displayName,
-          bio: generateBio(displayName, primaryCategory),
+          bio: generateBio(displayName, primaryCategory, address),
           years_experience: yearsExp,
           hourly_rate: randomRate(),
           service_radius_miles: randomInt(10, 50),

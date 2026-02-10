@@ -119,6 +119,7 @@ function SearchContent() {
     if (store.center) doSearch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
+    store.center,
     store.category,
     store.sort,
     store.minRating,
