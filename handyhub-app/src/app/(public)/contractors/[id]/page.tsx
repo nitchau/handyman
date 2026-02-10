@@ -409,7 +409,7 @@ export default function ContractorProfilePage({ params }: ContractorProfilePageP
                       maxLength={2000}
                       value={quoteDescription}
                       onChange={(e) => setQuoteDescription(e.target.value)}
-                      className="w-full rounded-lg border-slate-200 bg-slate-50 text-sm focus:border-primary focus:ring-primary"
+                      className="w-full rounded-lg border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:border-primary focus:ring-primary"
                       placeholder="What needs to be done?"
                       rows={4}
                     />
@@ -422,7 +422,7 @@ export default function ContractorProfilePage({ params }: ContractorProfilePageP
                       <select
                         value={quoteTimeline}
                         onChange={(e) => setQuoteTimeline(e.target.value)}
-                        className="w-full rounded-lg border-slate-200 bg-slate-50 text-sm focus:border-primary focus:ring-primary"
+                        className="w-full rounded-lg border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:border-primary focus:ring-primary"
                       >
                         {TIMELINE_OPTIONS.map((opt) => (
                           <option key={opt} value={opt}>{opt}</option>
@@ -440,7 +440,7 @@ export default function ContractorProfilePage({ params }: ContractorProfilePageP
                         value={quoteZip}
                         onChange={(e) => setQuoteZip(e.target.value)}
                         placeholder="97201"
-                        className="w-full rounded-lg border-slate-200 bg-slate-50 text-sm focus:border-primary focus:ring-primary"
+                        className="w-full rounded-lg border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:border-primary focus:ring-primary"
                       />
                     </div>
                   </div>
@@ -453,7 +453,7 @@ export default function ContractorProfilePage({ params }: ContractorProfilePageP
                       value={quoteName}
                       onChange={(e) => setQuoteName(e.target.value)}
                       placeholder="Optional"
-                      className="w-full rounded-lg border-slate-200 bg-slate-50 text-sm focus:border-primary focus:ring-primary"
+                      className="w-full rounded-lg border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:border-primary focus:ring-primary"
                     />
                   </div>
                   <div>
@@ -465,7 +465,7 @@ export default function ContractorProfilePage({ params }: ContractorProfilePageP
                       value={quoteEmail}
                       onChange={(e) => setQuoteEmail(e.target.value)}
                       placeholder="Optional"
-                      className="w-full rounded-lg border-slate-200 bg-slate-50 text-sm focus:border-primary focus:ring-primary"
+                      className="w-full rounded-lg border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:border-primary focus:ring-primary"
                     />
                   </div>
                   <Button
