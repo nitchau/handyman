@@ -106,7 +106,8 @@ function SearchContent() {
 
       if (res.ok) {
         store.setResults(json.results, json.meta.total);
-        if (json.meta.center) store.setCenter(json.meta.center);
+        // Only update center when we didn't already have one (address-only search)
+        if (json.meta.center && !store.center) store.setCenter(json.meta.center);
         store.setMapMoved(false);
       }
     } finally {
