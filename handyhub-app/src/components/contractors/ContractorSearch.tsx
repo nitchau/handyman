@@ -662,16 +662,15 @@ interface ContractorCardProps {
 function ContractorCard({
   contractor,
   selected,
-  onSelect,
   onHover,
 }: ContractorCardProps) {
   return (
-    <div
+    <Link
+      href={`/contractors/${contractor.id}`}
       data-contractor-id={contractor.id}
-      onClick={onSelect}
       onMouseEnter={() => onHover(true)}
       onMouseLeave={() => onHover(false)}
-      className={`bg-white rounded-xl border p-4 cursor-pointer transition-all ${
+      className={`block bg-white rounded-xl border p-4 cursor-pointer transition-all ${
         selected
           ? "border-emerald-500 ring-2 ring-emerald-100 shadow-sm"
           : "border-slate-200 hover:border-slate-300 hover:shadow-sm"
@@ -768,17 +767,13 @@ function ContractorCard({
               <Clock className="h-3 w-3" />
               Responds in ~2 hours
             </span>
-            <Link
-              href={`/contractors/${contractor.id}`}
-              onClick={(e) => e.stopPropagation()}
-              className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 hover:text-emerald-700"
-            >
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600">
               View Profile
               <ChevronRight className="h-3.5 w-3.5" />
-            </Link>
+            </span>
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
