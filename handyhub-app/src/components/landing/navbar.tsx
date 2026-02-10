@@ -22,7 +22,7 @@ export function Navbar() {
     { label: t("nav.designIdeas"), href: "/designs" },
     { label: t("nav.findPros"), href: "/contractors" },
     { label: t("nav.toolRentals"), href: "/tools" },
-    { label: t("nav.howItWorks"), href: "#how-it-works" },
+    { label: t("nav.howItWorks"), href: "/#how-it-works" },
   ];
 
   return (
