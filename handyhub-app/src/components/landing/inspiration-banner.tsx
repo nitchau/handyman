@@ -12,7 +12,7 @@ const FEATURED_PHOTOS = [
   "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=400&h=300&fit=crop",
   "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=300&fit=crop",
   "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=400&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1600566753086-00f18f6b0896?w=400&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=300&fit=crop",
   "https://images.unsplash.com/photo-1617806118233-18e1de247200?w=400&h=300&fit=crop",
 ];
 

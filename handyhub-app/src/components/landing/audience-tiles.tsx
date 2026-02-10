@@ -104,8 +104,8 @@ export function AudienceTiles() {
   const { t } = useTranslation();
 
   return (
-    <section className="px-4 py-12 sm:px-6 lg:px-8">
-      <h2 className="mb-12 text-center text-2xl font-bold text-slate-900">
+    <section className="px-4 py-8 sm:px-6 lg:px-8">
+      <h2 className="mb-8 text-center text-2xl font-bold text-slate-900">
         {t("audience.heading")}
       </h2>
       <div className="mx-auto grid max-w-7xl gap-6 md:grid-cols-2 lg:grid-cols-4">

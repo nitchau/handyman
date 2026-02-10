@@ -390,8 +390,8 @@ export const designIdeas: readonly DesignIdea[] = [
     estimated_cost: 1800,
     difficulty_level: Difficulty.BEGINNER,
     is_diy_friendly: true,
-    media_urls: ["https://images.unsplash.com/photo-1600566753086-00f18f6b0896?w=800&h=1000&fit=crop"],
-    primary_photo_url: "https://images.unsplash.com/photo-1600566753086-00f18f6b0896?w=800&h=1000&fit=crop",
+    media_urls: ["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=1000&fit=crop"],
+    primary_photo_url: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=1000&fit=crop",
     before_photo_url: null,
     tags: ["bohemian", "outdoor", "string lights", "plants"],
     product_tags: [],
@@ -1011,5 +1011,5 @@ export const designerOrders: readonly DesignerOrder[] = [
 export const topDesigns: readonly TopDesign[] = [
   { id: "td1", title: "Modern Grey Living", image_url: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=400&h=300&fit=crop", views: 1200, likes: 842 },
   { id: "td2", title: "Nordic Kitchen", image_url: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=300&fit=crop", views: 950, likes: 620 },
-  { id: "td3", title: "Urban Oasis Patio", image_url: "https://images.unsplash.com/photo-1600566753086-00f18f6b0896?w=400&h=300&fit=crop", views: 880, likes: 415 },
+  { id: "td3", title: "Urban Oasis Patio", image_url: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=300&fit=crop", views: 880, likes: 415 },
 ] as const;

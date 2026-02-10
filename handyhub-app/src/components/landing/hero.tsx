@@ -8,7 +8,7 @@ export function Hero() {
   const { t } = useTranslation();
 
   return (
-    <section className="relative overflow-hidden px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-32">
+    <section className="relative overflow-hidden px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
       <div className="mx-auto max-w-4xl text-center relative z-10">
         <div className="mb-8 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-primary">
           <span className="text-xs font-bold uppercase tracking-widest">
@@ -20,10 +20,10 @@ export function Hero() {
           <br />
           <span className="text-primary">{t("hero.title2")}</span>
         </h1>
-        <p className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-slate-600 md:text-xl">
+        <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-slate-600 md:text-xl">
           {t("hero.subtitle")}
         </p>
-        <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+        <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Link href="/plan">
             <Button size="lg" className="px-10 py-4 text-lg font-bold shadow-xl shadow-primary/30">
               {t("hero.startProject")}
