@@ -330,7 +330,7 @@ export const toolListings: readonly ToolListing[] = [
   {
     id: "t3",
     name: "Bosch Orbit Sander",
-    image_url: "https://images.unsplash.com/photo-1530124566582-a45a7e5dc089?w=600&h=400&fit=crop",
+    image_url: "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=600&h=400&fit=crop",
     category: "Sanders",
     rating: 4.7,
     distance_miles: 2.5,
@@ -350,7 +350,7 @@ export const toolListings: readonly ToolListing[] = [
   {
     id: "t5",
     name: "Ryobi Pressure Washer",
-    image_url: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=600&h=400&fit=crop",
+    image_url: "https://images.unsplash.com/photo-1581244277943-fe4a9c777189?w=600&h=400&fit=crop",
     category: "Cleaning",
     rating: 4.5,
     distance_miles: 1.5,
