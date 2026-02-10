@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Map, AdvancedMarker, useMap } from "@vis.gl/react-google-maps";
 import { GOOGLE_MAPS_CONFIG } from "@/lib/google-maps";
 import { Search } from "lucide-react";
@@ -42,6 +42,7 @@ export function ContractorMap({
 }: ContractorMapProps) {
   const map = useMap();
   const hasInitialFit = useRef(false);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   // Auto-fit bounds to show all contractors
   useEffect(() => {
@@ -102,10 +103,11 @@ export function ContractorMap({
             key={c.id}
             position={{ lat: c.lat, lng: c.lng }}
             onClick={() => onMarkerClick?.(c.id)}
+            zIndex={hoveredId === c.id || selectedId === c.id ? 1000 : 1}
           >
             <div
-              onMouseEnter={() => onMarkerHover?.(c.id)}
-              onMouseLeave={() => onMarkerHover?.(null)}
+              onMouseEnter={() => { setHoveredId(c.id); onMarkerHover?.(c.id); }}
+              onMouseLeave={() => { setHoveredId(null); onMarkerHover?.(null); }}
               className="relative group"
             >
               {/* Tooltip */}
