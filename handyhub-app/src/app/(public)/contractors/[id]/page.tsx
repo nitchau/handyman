@@ -444,31 +444,29 @@ export default function ContractorProfilePage({ params }: ContractorProfilePageP
                       />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">
-                        Your Name
-                      </label>
-                      <input
-                        type="text"
-                        value={quoteName}
-                        onChange={(e) => setQuoteName(e.target.value)}
-                        placeholder="Optional"
-                        className="w-full rounded-lg border-slate-200 bg-slate-50 text-sm focus:border-primary focus:ring-primary"
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">
-                        Your Email
-                      </label>
-                      <input
-                        type="email"
-                        value={quoteEmail}
-                        onChange={(e) => setQuoteEmail(e.target.value)}
-                        placeholder="Optional"
-                        className="w-full rounded-lg border-slate-200 bg-slate-50 text-sm focus:border-primary focus:ring-primary"
-                      />
-                    </div>
+                  <div>
+                    <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">
+                      Your Name
+                    </label>
+                    <input
+                      type="text"
+                      value={quoteName}
+                      onChange={(e) => setQuoteName(e.target.value)}
+                      placeholder="Optional"
+                      className="w-full rounded-lg border-slate-200 bg-slate-50 text-sm focus:border-primary focus:ring-primary"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">
+                      Your Email
+                    </label>
+                    <input
+                      type="email"
+                      value={quoteEmail}
+                      onChange={(e) => setQuoteEmail(e.target.value)}
+                      placeholder="Optional"
+                      className="w-full rounded-lg border-slate-200 bg-slate-50 text-sm focus:border-primary focus:ring-primary"
+                    />
                   </div>
                   <Button
                     type="submit"
