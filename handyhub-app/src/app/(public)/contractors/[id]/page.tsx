@@ -2,10 +2,11 @@
 
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
-import { Star, MapPin, Shield, ShieldCheck, ArrowLeft, Loader2, Briefcase, Clock } from "lucide-react";
+import { Star, MapPin, Shield, ShieldCheck, ArrowLeft, Loader2, Briefcase, Clock, CheckCircle2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { TIMELINE_OPTIONS } from "@/lib/validations/quote";
 
 interface ContractorProfile {
   id: string;
@@ -68,6 +69,15 @@ export default function ContractorProfilePage({ params }: ContractorProfilePageP
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Quote form state
+  const [quoteDescription, setQuoteDescription] = useState("");
+  const [quoteTimeline, setQuoteTimeline] = useState<string>(TIMELINE_OPTIONS[0]);
+  const [quoteZip, setQuoteZip] = useState("");
+  const [quoteName, setQuoteName] = useState("");
+  const [quoteEmail, setQuoteEmail] = useState("");
+  const [quoteSubmitting, setQuoteSubmitting] = useState(false);
+  const [quoteResult, setQuoteResult] = useState<{ ok: boolean; message: string } | null>(null);
+
   useEffect(() => {
     async function fetchContractor() {
       try {
@@ -86,6 +96,47 @@ export default function ContractorProfilePage({ params }: ContractorProfilePageP
     }
     fetchContractor();
   }, [id]);
+
+  async function handleQuoteSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setQuoteSubmitting(true);
+    setQuoteResult(null);
+
+    try {
+      const res = await fetch(`/api/contractors/${id}/quote`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          description: quoteDescription,
+          timeline: quoteTimeline,
+          zip_code: quoteZip,
+          sender_name: quoteName,
+          sender_email: quoteEmail,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        const msg =
+          data.issues
+            ? Object.values(data.issues as Record<string, string[]>).flat().join(". ")
+            : data.error || "Something went wrong. Please try again.";
+        setQuoteResult({ ok: false, message: msg });
+        return;
+      }
+
+      setQuoteResult({ ok: true, message: "Quote request sent! The contractor will be in touch." });
+      setQuoteDescription("");
+      setQuoteTimeline(TIMELINE_OPTIONS[0]);
+      setQuoteZip("");
+      setQuoteName("");
+      setQuoteEmail("");
+    } catch {
+      setQuoteResult({ ok: false, message: "Network error. Please try again." });
+    } finally {
+      setQuoteSubmitting(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -206,7 +257,12 @@ export default function ContractorProfilePage({ params }: ContractorProfilePageP
 
           {/* CTA buttons */}
           <div className="flex gap-3 shrink-0">
-            <Button className="shadow-lg">Get Free Quote</Button>
+            <Button
+              className="shadow-lg"
+              onClick={() => document.getElementById("quote-form")?.scrollIntoView({ behavior: "smooth" })}
+            >
+              Get Free Quote
+            </Button>
             <Button variant="outline">Message</Button>
           </div>
         </div>
@@ -317,7 +373,7 @@ export default function ContractorProfilePage({ params }: ContractorProfilePageP
         {/* Sidebar */}
         <aside>
           <div className="sticky top-20">
-            <Card className="overflow-hidden border-l-[6px] border-l-primary shadow-xl">
+            <Card id="quote-form" className="overflow-hidden border-l-[6px] border-l-primary shadow-xl">
               <CardContent className="p-0">
                 <div className="border-b p-6">
                   <h4 className="text-xl font-bold">Get a Free Quote</h4>
@@ -325,12 +381,34 @@ export default function ContractorProfilePage({ params }: ContractorProfilePageP
                     Describe your project and get a response.
                   </p>
                 </div>
-                <div className="space-y-4 p-6">
+                <form onSubmit={handleQuoteSubmit} className="space-y-4 p-6">
+                  {quoteResult && (
+                    <div
+                      className={cn(
+                        "flex items-start gap-2 rounded-lg p-3 text-sm",
+                        quoteResult.ok
+                          ? "bg-green-50 text-green-700"
+                          : "bg-red-50 text-red-700"
+                      )}
+                    >
+                      {quoteResult.ok ? (
+                        <CheckCircle2 className="mt-0.5 size-4 shrink-0" />
+                      ) : (
+                        <AlertCircle className="mt-0.5 size-4 shrink-0" />
+                      )}
+                      {quoteResult.message}
+                    </div>
+                  )}
                   <div>
                     <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">
-                      Describe Your Project
+                      Describe Your Project *
                     </label>
                     <textarea
+                      required
+                      minLength={10}
+                      maxLength={2000}
+                      value={quoteDescription}
+                      onChange={(e) => setQuoteDescription(e.target.value)}
                       className="w-full rounded-lg border-slate-200 bg-slate-50 text-sm focus:border-primary focus:ring-primary"
                       placeholder="What needs to be done?"
                       rows={4}
@@ -341,29 +419,72 @@ export default function ContractorProfilePage({ params }: ContractorProfilePageP
                       <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">
                         Timeline
                       </label>
-                      <select className="w-full rounded-lg border-slate-200 bg-slate-50 text-sm focus:border-primary focus:ring-primary">
-                        <option>ASAP</option>
-                        <option>Within 2 weeks</option>
-                        <option>1-3 months</option>
-                        <option>Flexible</option>
+                      <select
+                        value={quoteTimeline}
+                        onChange={(e) => setQuoteTimeline(e.target.value)}
+                        className="w-full rounded-lg border-slate-200 bg-slate-50 text-sm focus:border-primary focus:ring-primary"
+                      >
+                        {TIMELINE_OPTIONS.map((opt) => (
+                          <option key={opt} value={opt}>{opt}</option>
+                        ))}
                       </select>
                     </div>
                     <div>
                       <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">
-                        ZIP Code
+                        ZIP Code *
                       </label>
                       <input
+                        required
                         type="text"
+                        pattern="\d{5}"
+                        value={quoteZip}
+                        onChange={(e) => setQuoteZip(e.target.value)}
                         placeholder="97201"
                         className="w-full rounded-lg border-slate-200 bg-slate-50 text-sm focus:border-primary focus:ring-primary"
                       />
                     </div>
                   </div>
-                  <Button className="w-full py-4 font-bold shadow-lg">Request Quote</Button>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">
+                        Your Name
+                      </label>
+                      <input
+                        type="text"
+                        value={quoteName}
+                        onChange={(e) => setQuoteName(e.target.value)}
+                        placeholder="Optional"
+                        className="w-full rounded-lg border-slate-200 bg-slate-50 text-sm focus:border-primary focus:ring-primary"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">
+                        Your Email
+                      </label>
+                      <input
+                        type="email"
+                        value={quoteEmail}
+                        onChange={(e) => setQuoteEmail(e.target.value)}
+                        placeholder="Optional"
+                        className="w-full rounded-lg border-slate-200 bg-slate-50 text-sm focus:border-primary focus:ring-primary"
+                      />
+                    </div>
+                  </div>
+                  <Button
+                    type="submit"
+                    disabled={quoteSubmitting}
+                    className="w-full py-4 font-bold shadow-lg"
+                  >
+                    {quoteSubmitting ? (
+                      <><Loader2 className="size-4 animate-spin" /> Sending...</>
+                    ) : (
+                      "Request Quote"
+                    )}
+                  </Button>
                   <p className="text-center text-[10px] text-slate-400">
                     No credit card required. Requesting a quote does not commit you to hire.
                   </p>
-                </div>
+                </form>
               </CardContent>
             </Card>
 

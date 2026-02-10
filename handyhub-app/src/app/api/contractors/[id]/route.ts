@@ -31,8 +31,7 @@ export async function GET(_req: NextRequest, { params }: RouteContext) {
       users_profile!contractors_user_id_fkey (
         first_name,
         last_name,
-        avatar_url,
-        email
+        avatar_url
       )
     `
     )
@@ -68,7 +67,6 @@ export async function GET(_req: NextRequest, { params }: RouteContext) {
     first_name: string;
     last_name: string;
     avatar_url: string | null;
-    email: string;
   };
 
   return NextResponse.json({
