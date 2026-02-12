@@ -201,7 +201,7 @@ export default function DesignsPage() {
       {/* FAB */}
       <Link
         href="/dashboard/upload"
-        className="fixed bottom-6 right-6 z-40 flex size-14 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-transform hover:scale-105"
+        className="fixed bottom-24 right-6 z-40 flex size-14 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-transform hover:scale-105"
       >
         <Plus className="size-6" />
       </Link>
