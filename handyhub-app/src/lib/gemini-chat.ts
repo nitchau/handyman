@@ -1,9 +1,9 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-let model: ReturnType<GoogleGenerativeAI["getGenerativeModel"]> | null = null;
+let genAIInstance: GoogleGenerativeAI | null = null;
 
-export function getChatModel() {
-  if (model) return model;
+function getGenAI() {
+  if (genAIInstance) return genAIInstance;
 
   const key = process.env.GEMINI_API_KEY;
   if (!key) {
@@ -12,14 +12,18 @@ export function getChatModel() {
     );
   }
 
-  const genAI = new GoogleGenerativeAI(key);
-  model = genAI.getGenerativeModel({
+  genAIInstance = new GoogleGenerativeAI(key);
+  return genAIInstance;
+}
+
+export function getChatModel(systemInstruction: string) {
+  const genAI = getGenAI();
+  return genAI.getGenerativeModel({
     model: "gemini-2.0-flash",
+    systemInstruction,
     generationConfig: {
       temperature: 0.7,
       maxOutputTokens: 1024,
     },
   });
-
-  return model;
 }

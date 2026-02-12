@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
       userRole: userRole || "visitor",
     });
 
-    const model = getChatModel();
+    const model = getChatModel(systemInstruction);
 
     // Build Gemini chat history (all messages except the last one)
     const history = messages.slice(0, -1).map((m) => ({
@@ -37,10 +37,7 @@ export async function POST(req: NextRequest) {
 
     const lastMessage = messages[messages.length - 1];
 
-    const chat = model.startChat({
-      history,
-      systemInstruction: { role: "user", parts: [{ text: systemInstruction }] },
-    });
+    const chat = model.startChat({ history });
 
     const result = await chat.sendMessageStream(lastMessage.content);
 
