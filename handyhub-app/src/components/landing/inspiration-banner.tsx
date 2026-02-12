@@ -39,18 +39,18 @@ export function InspirationBanner() {
 
   return (
     <section className="px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl rounded-[2rem] bg-emerald-50 p-8 md:p-14">
+      <div className="mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-emerald-50 p-6 sm:p-8 md:p-14">
         <div className="grid items-center gap-10 lg:grid-cols-2">
           {/* Left — Copy */}
-          <div>
-            <h2 className="mb-4 text-3xl font-extrabold leading-tight text-slate-900 md:text-4xl">
+          <div className="min-w-0">
+            <h2 className="mb-4 text-2xl font-extrabold leading-tight text-slate-900 sm:text-3xl md:text-4xl">
               {t("inspiration.title")}
             </h2>
-            <p className="mb-8 max-w-lg text-base leading-relaxed text-slate-600">
+            <p className="mb-8 text-sm leading-relaxed text-slate-600 sm:text-base md:max-w-lg">
               {t("inspiration.subtitle")}
             </p>
 
-            <div className="mb-8 flex flex-wrap gap-3">
+            <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Link href="/designs">
                 <Button size="lg" className="gap-2 px-6 font-bold shadow-lg shadow-primary/20">
                   {t("inspiration.explore")} <ArrowRight className="size-4" />
@@ -87,14 +87,14 @@ export function InspirationBanner() {
           </div>
 
           {/* Right — Mini preview cards */}
-          <div className="flex justify-center gap-3 lg:justify-end">
+          <div className="flex justify-center gap-2 sm:gap-3 lg:justify-end">
             {visiblePhotos.map((src, i) => (
               <div
                 key={`${activeIndex}-${i}`}
                 className={`overflow-hidden rounded-xl shadow-md transition-all duration-500 ${
                   i === 1
-                    ? "w-36 scale-105 sm:w-44"
-                    : "w-28 opacity-80 sm:w-36"
+                    ? "w-28 sm:w-36 sm:scale-105 lg:w-44"
+                    : "w-24 opacity-80 sm:w-28 lg:w-36"
                 }`}
               >
                 <Image
@@ -102,7 +102,7 @@ export function InspirationBanner() {
                   alt="Featured design"
                   width={180}
                   height={240}
-                  className="h-48 w-full object-cover sm:h-56"
+                  className="h-40 w-full object-cover sm:h-48 lg:h-56"
                 />
               </div>
             ))}

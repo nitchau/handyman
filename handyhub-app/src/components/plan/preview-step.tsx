@@ -245,7 +245,7 @@ export function PreviewStep() {
             /* eslint-disable-next-line @next/next/no-img-element */
             <img
               src={previewImage}
-              alt="AI-generated project preview"
+              alt="Handy-generated project preview"
               className="w-full max-w-2xl rounded-lg"
             />
           )}

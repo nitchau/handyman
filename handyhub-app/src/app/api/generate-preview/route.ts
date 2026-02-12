@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
       let friendly: string;
       if (raw.includes("429") || raw.includes("quota")) {
         friendly =
-          "The AI service is temporarily at capacity. Please wait a minute and try again.";
+          "Handy is temporarily at capacity. Please wait a minute and try again.";
       } else if (raw.includes("401") || raw.includes("API_KEY")) {
         friendly =
           "Invalid or missing Gemini API key. Check your GEMINI_API_KEY in .env.local.";
@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
           "The request timed out. Try uploading fewer or smaller photos.";
       } else {
         friendly =
-          "The AI visualization service encountered an error. Please try again.";
+          "Handy's visualization service encountered an error. Please try again.";
       }
 
       return NextResponse.json({ error: friendly }, { status: 502 });
@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
 
     if (!result.imageBase64) {
       return NextResponse.json(
-        { error: "AI did not return an image. Please try again." },
+        { error: "Handy did not return an image. Please try again." },
         { status: 502 }
       );
     }

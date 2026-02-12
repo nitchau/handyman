@@ -7,7 +7,7 @@ const TIER_CONFIG: Record<
   { label: string; className: string }
 > = {
   [ConfidenceTier.AI_ESTIMATE]: {
-    label: "AI Estimate",
+    label: "Handy Estimate",
     className: "border-amber-300 bg-amber-50 text-amber-700",
   },
   [ConfidenceTier.PRO_VERIFIED]: {

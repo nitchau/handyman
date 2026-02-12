@@ -384,7 +384,7 @@ function SearchContent() {
                       className="inline-flex items-center gap-1.5 mt-4 text-sm font-medium text-emerald-600 hover:text-emerald-700"
                     >
                       <Lightbulb className="h-4 w-4" />
-                      Interested in DIY? Our AI can help you plan the project
+                      Interested in DIY? Handy can help you plan the project
                       yourself
                       <ChevronRight className="h-3.5 w-3.5" />
                     </Link>

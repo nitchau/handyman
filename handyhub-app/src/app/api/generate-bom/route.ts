@@ -222,7 +222,7 @@ export async function POST(req: NextRequest) {
       let friendly: string;
       if (raw.includes("429") || raw.includes("quota")) {
         friendly =
-          "The AI service is temporarily at capacity. Please wait a minute and try again.";
+          "Handy is temporarily at capacity. Please wait a minute and try again.";
       } else if (raw.includes("401") || raw.includes("API_KEY")) {
         friendly =
           "Invalid or missing Gemini API key. Check your GEMINI_API_KEY in .env.local.";
@@ -230,7 +230,7 @@ export async function POST(req: NextRequest) {
         friendly =
           "The request timed out. Try uploading fewer or smaller photos.";
       } else {
-        friendly = "The AI service encountered an error. Please try again.";
+        friendly = "Handy encountered an error. Please try again.";
       }
 
       return NextResponse.json({ error: friendly }, { status: 502 });
@@ -243,7 +243,7 @@ export async function POST(req: NextRequest) {
     } catch {
       console.error("Failed to parse Gemini response as JSON:", geminiResponse);
       return NextResponse.json(
-        { error: "AI returned an invalid response. Please try again." },
+        { error: "Handy returned an invalid response. Please try again." },
         { status: 502 }
       );
     }

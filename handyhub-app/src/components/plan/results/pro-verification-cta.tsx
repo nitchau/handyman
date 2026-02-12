@@ -17,7 +17,7 @@ export function ProVerificationCta() {
             Want a pro to verify this estimate?
           </p>
           <p className="mt-1 text-sm text-emerald-700">
-            Get a licensed contractor to review your AI-generated plan and
+            Get a licensed contractor to review your Handy-generated plan and
             confirm quantities, materials, and costs before you buy.
           </p>
         </div>

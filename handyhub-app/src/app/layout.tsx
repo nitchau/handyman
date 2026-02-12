@@ -17,7 +17,7 @@ const notoSansSC = Noto_Sans_SC({
 export const metadata: Metadata = {
   title: "HandyHub — Every Home Project Starts Here",
   description:
-    "Plan it. Source it. Build it. Whether you DIY or hire a pro. AI-powered project planning, price comparison, and verified contractors.",
+    "Plan it. Source it. Build it. Whether you DIY or hire a pro. Handy helps with project planning, price comparison, and finding verified contractors.",
 };
 
 export default function RootLayout({
