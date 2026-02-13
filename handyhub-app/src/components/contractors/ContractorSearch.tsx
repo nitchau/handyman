@@ -199,7 +199,7 @@ function SearchContent() {
 
       <div className="min-h-screen bg-background">
         {/* ── Search bar ─────────────────────────────────────────────── */}
-        <div className="bg-white border-b border-slate-200 sticky top-0 z-20">
+        <div className="bg-white border-b border-slate-200 sticky top-14 z-20">
           <div className="max-w-7xl mx-auto px-4 py-3">
             <div className="flex flex-col sm:flex-row gap-2">
               <div className="relative flex-1">
@@ -356,7 +356,7 @@ function SearchContent() {
               className={`flex-1 min-w-0 px-4 py-4 lg:pr-0 overflow-y-auto ${
                 store.mobileView === "map" ? "hidden lg:block" : ""
               }`}
-              style={{ maxHeight: "calc(100vh - 180px)" }}
+              style={{ maxHeight: "calc(100vh - 220px)" }}
             >
               {/* Loading skeleton */}
               {store.loading && store.results.length === 0 && (
@@ -464,7 +464,7 @@ function SearchContent() {
 
             {/* Right: map — desktop always, mobile only in map view */}
             <div
-              className={`lg:w-[40%] lg:sticky lg:top-[140px] lg:h-[calc(100vh-180px)] lg:p-4 ${
+              className={`lg:w-[40%] lg:sticky lg:top-[196px] lg:h-[calc(100vh-220px)] lg:p-4 ${
                 store.mobileView === "map"
                   ? "w-full h-[calc(100vh-220px)]"
                   : "hidden lg:block"
