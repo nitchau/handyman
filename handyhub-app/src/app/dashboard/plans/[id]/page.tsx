@@ -44,9 +44,12 @@ export default function PlanResultPage() {
         </h1>
       </div>
 
-      <DisclaimerBanner />
+      <DisclaimerBanner
+        referenceDetected={result.reference_object_detected}
+        confidenceScore={result.confidence_score}
+      />
       <ProjectSummaryCard project={result} />
-      <MaterialsTable items={result.items} />
+      <MaterialsTable items={result.items} tasks={result.tasks} />
       <ToolsCard tools={result.tools} />
       <LaborCard project={result} />
       <ProVerificationCta />

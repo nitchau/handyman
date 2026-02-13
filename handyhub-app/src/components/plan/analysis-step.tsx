@@ -23,6 +23,10 @@ export function AnalysisStep() {
     projectData,
     mediaFiles,
     dimensions,
+    roomDescription,
+    dimensionMode,
+    wallDimensions,
+    inspirationFiles,
     designReference,
     nextStep,
     setAnalysisStatus,
@@ -66,8 +70,18 @@ export function AnalysisStep() {
     if (dimensions) {
       formData.append("dimensions", JSON.stringify(dimensions));
     }
+    formData.append("dimensionMode", dimensionMode);
+    if (dimensionMode === "wall") {
+      formData.append("wallDimensions", JSON.stringify(wallDimensions));
+    }
+    if (roomDescription.trim()) {
+      formData.append("roomDescription", roomDescription.trim());
+    }
     for (const file of mediaFiles) {
       formData.append("images", file);
+    }
+    for (const file of inspirationFiles) {
+      formData.append("inspirationImages", file);
     }
     if (designReference) {
       formData.append(
@@ -124,6 +138,10 @@ export function AnalysisStep() {
     projectData,
     mediaFiles,
     dimensions,
+    roomDescription,
+    dimensionMode,
+    wallDimensions,
+    inspirationFiles,
     designReference,
     setAnalysisStatus,
     setResult,

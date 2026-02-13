@@ -217,6 +217,23 @@ export interface BOMItem {
   created_at: string;
 }
 
+// ── Wall / Dimension Types ────────────────────────────────────────────
+
+export interface WallDimension {
+  name: string;
+  width_ft: number;
+  height_ft: number;
+}
+
+export type DimensionMode = "room" | "wall";
+
+export interface FurniturePreferences {
+  keepFurniture: boolean;
+  keepKitchenItems: boolean;
+  keepDecor: boolean;
+  notes: string;
+}
+
 // ── Preview Types ─────────────────────────────────────────────────────
 
 export type PreviewStatus = "idle" | "generating" | "complete" | "error";
@@ -275,6 +292,34 @@ export enum VerificationStatus {
   VERIFIED = "verified",
 }
 
+// ── Catalog Cache Types ──────────────────────────────────────────────
+
+export interface CatalogCacheItem {
+  id: string;
+  sku: string;
+  name: string;
+  brand: string | null;
+  category: string;
+  retailer: Retailer;
+  price: number;
+  unit: string;
+  url: string;
+  in_stock: boolean;
+}
+
+export interface CatalogMatchResult extends CatalogCacheItem {
+  similarity_score: number;
+}
+
+export type PriceSource = "catalog" | "ai_estimate";
+
+export interface BomTask {
+  id: string;
+  name: string;
+  sortOrder: number;
+  itemIds: string[];
+}
+
 // ── BOM Engine Interfaces ─────────────────────────────────────────────
 
 export interface RoomDimensions {
@@ -299,6 +344,11 @@ export interface BomItem {
   confidence: number;
   prices: ProductPriceComparison[];
   notes: string | null;
+  waste_factor: number;
+  quantity_with_waste: number;
+  catalog_sku: string | null;
+  price_source: PriceSource;
+  task: string;
 }
 
 export interface BomToolRequirement {
@@ -336,6 +386,8 @@ export interface BomProject {
   verification: BomVerification;
   source_design_id: string | null;
   source_designer_id: string | null;
+  tasks: BomTask[];
+  reference_object_detected: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -692,4 +744,27 @@ export interface ToolCategory {
   id: string;
   label: string;
   icon: string;
+}
+
+// ── Chat Persistence Types ──────────────────────────────────────────
+
+export interface ChatSession {
+  id: string;
+  clerk_id: string;
+  title: string | null;
+  message_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ChatMessageRecord {
+  id: string;
+  session_id: string;
+  role: "user" | "model";
+  content: string;
+  created_at: string;
+}
+
+export interface ChatSessionWithPreview extends ChatSession {
+  preview?: string;
 }

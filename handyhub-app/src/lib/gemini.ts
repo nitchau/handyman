@@ -18,7 +18,7 @@ export function getBomModel() {
     generationConfig: {
       responseMimeType: "application/json",
       temperature: 0.3,
-      maxOutputTokens: 8192,
+      maxOutputTokens: 16384,
     },
   });
 

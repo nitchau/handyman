@@ -33,6 +33,8 @@ export function PreviewStep() {
   const {
     projectData,
     mediaFiles,
+    inspirationFiles,
+    furniturePreferences,
     result,
     previewImage,
     previewDescription,
@@ -63,14 +65,22 @@ export function PreviewStep() {
         const body: Record<string, unknown> = {
           projectDescription: projectData.description,
           history: previewHistory,
+          furniturePreferences,
         };
 
         if (previewHistory.length === 0) {
-          // First call — include room photos
+          // First call — include room photos and inspiration
           const photos = await Promise.all(
             mediaFiles.slice(0, 5).map(fileToDataUrl)
           );
           body.roomPhotos = photos;
+
+          if (inspirationFiles.length > 0) {
+            const inspirationDataUrls = await Promise.all(
+              inspirationFiles.slice(0, 10).map(fileToDataUrl)
+            );
+            body.inspirationPhotos = inspirationDataUrls;
+          }
         }
 
         if (userFeedback) {
@@ -121,6 +131,8 @@ export function PreviewStep() {
     [
       projectData.description,
       mediaFiles,
+      inspirationFiles,
+      furniturePreferences,
       previewHistory,
       addPreviewTurn,
       setPreviewImage,
@@ -137,9 +149,8 @@ export function PreviewStep() {
       hasStarted.current = true;
       generate();
     }
-    return () => {
-      abortRef.current?.abort();
-    };
+    // Don't abort on cleanup — React strict mode in dev double-mounts
+    // components, and aborting here leaves the UI stuck in "generating"
   }, [previewStatus, generate]);
 
   const handleSendFeedback = () => {
@@ -279,7 +290,7 @@ export function PreviewStep() {
       <div className="flex justify-between">
         <Button
           variant="outline"
-          onClick={() => setStep(1)}
+          onClick={() => setStep(3)}
           className="gap-2"
         >
           <ArrowLeft className="size-4" />

@@ -1,4 +1,4 @@
-import { DollarSign, Package, Ruler, Wrench } from "lucide-react";
+import { CheckCircle, DollarSign, Package, Ruler, Wrench } from "lucide-react";
 import type { BomProject } from "@/types";
 import {
   Card,
@@ -17,17 +17,21 @@ function formatCurrency(n: number) {
   }).format(n);
 }
 
+function getItemQty(item: { quantity_with_waste?: number; quantity: number }) {
+  return item.quantity_with_waste ?? item.quantity;
+}
+
 function getLowestTotal(project: BomProject) {
   return project.items.reduce((sum, item) => {
     const lowest = Math.min(...item.prices.map((p) => p.price));
-    return sum + lowest * item.quantity;
+    return sum + lowest * getItemQty(item);
   }, 0);
 }
 
 function getHighestTotal(project: BomProject) {
   return project.items.reduce((sum, item) => {
     const highest = Math.max(...item.prices.map((p) => p.price));
-    return sum + highest * item.quantity;
+    return sum + highest * getItemQty(item);
   }, 0);
 }
 
@@ -68,7 +72,15 @@ export function ProjectSummaryCard({ project }: ProjectSummaryCardProps) {
     <Card>
       <CardHeader>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <CardTitle className="text-xl">{project.title}</CardTitle>
+          <div className="flex items-center gap-2">
+            <CardTitle className="text-xl">{project.title}</CardTitle>
+            {project.reference_object_detected && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
+                <CheckCircle className="size-3" />
+                Reference detected
+              </span>
+            )}
+          </div>
           <ConfidenceBadge
             tier={project.confidence_tier}
             score={project.confidence_score}

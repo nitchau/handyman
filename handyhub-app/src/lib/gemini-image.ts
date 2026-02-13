@@ -27,13 +27,27 @@ export async function generatePreviewImage(
 ): Promise<PreviewImageResult> {
   const ai = getClient();
 
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash-preview-05-20",
-    contents,
-    config: {
-      responseModalities: ["TEXT", "IMAGE"],
-    },
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 90_000);
+
+  let response;
+  try {
+    response = await ai.models.generateContent({
+      model: "gemini-2.5-flash-image",
+      contents,
+      config: {
+        responseModalities: ["TEXT", "IMAGE"],
+        abortSignal: controller.signal,
+      },
+    });
+  } catch (err: unknown) {
+    clearTimeout(timeout);
+    if (err instanceof Error && err.name === "AbortError") {
+      throw new Error("timeout: Image generation timed out after 90 seconds");
+    }
+    throw err;
+  }
+  clearTimeout(timeout);
 
   const result: PreviewImageResult = {};
 

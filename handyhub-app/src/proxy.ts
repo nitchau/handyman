@@ -16,6 +16,7 @@ const isPublicApiRoute = createRouteMatcher([
 const isProtectedRoute = createRouteMatcher([
   '/dashboard(.*)',
   '/api/designer/(.*)',
+  '/api/chat/history(.*)',
 ]);
 
 const isDesignerRoute = createRouteMatcher([

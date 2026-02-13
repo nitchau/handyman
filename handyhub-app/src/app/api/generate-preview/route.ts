@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { generatePreviewImage } from "@/lib/gemini-image";
 import { buildPreviewPrompt } from "@/lib/prompts/preview-prompt";
 import type { Content } from "@google/genai";
+import type { FurniturePreferences } from "@/types";
 
 export const maxDuration = 120;
 
@@ -16,6 +17,8 @@ interface ConversationTurn {
 interface RequestBody {
   projectDescription: string;
   roomPhotos?: string[];
+  inspirationPhotos?: string[];
+  furniturePreferences?: FurniturePreferences;
   history?: ConversationTurn[];
   feedback?: string;
 }
@@ -49,12 +52,29 @@ export async function POST(req: NextRequest) {
         .map(dataUrlToPart)
         .filter((p): p is NonNullable<typeof p> => p !== null);
 
-      const prompt = buildPreviewPrompt(body.projectDescription);
+      // Build inspiration photo parts
+      const inspirationPhotos = (body.inspirationPhotos || []).slice(0, 10);
+      const inspirationParts = inspirationPhotos
+        .map(dataUrlToPart)
+        .filter((p): p is NonNullable<typeof p> => p !== null);
+
+      const prompt = buildPreviewPrompt({
+        description: body.projectDescription,
+        furniturePreferences: body.furniturePreferences ?? null,
+        hasInspirationPhotos: inspirationParts.length > 0,
+      });
+
+      const parts: Content["parts"] = [...photoParts];
+      if (inspirationParts.length > 0) {
+        parts.push({ text: "--- DESIGN INSPIRATION PHOTOS ---" });
+        parts.push(...inspirationParts);
+      }
+      parts.push({ text: prompt });
 
       contents = [
         {
           role: "user",
-          parts: [...photoParts, { text: prompt }],
+          parts,
         },
       ];
     } else {

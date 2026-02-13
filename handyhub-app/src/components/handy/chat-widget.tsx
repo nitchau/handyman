@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { MessageCircle, X } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 import { useChatStore } from "@/stores";
 import { ChatPanel } from "./chat-panel";
 
@@ -33,7 +34,11 @@ export function ChatWidget() {
   const dismissGreeting = useChatStore((s) => s.dismissGreeting);
   const greetingShownPages = useChatStore((s) => s.greetingShownPages);
   const markGreetingShown = useChatStore((s) => s.markGreetingShown);
+  const initSession = useChatStore((s) => s.initSession);
   const pathname = usePathname();
+
+  const { isSignedIn } = useAuth();
+  const sessionInitialized = useRef(false);
 
   const [showGreeting, setShowGreeting] = useState(false);
 
@@ -41,6 +46,13 @@ export function ChatWidget() {
   useEffect(() => {
     hydrate();
   }, [hydrate]);
+
+  // Initialize session once Clerk has loaded and hydration is done
+  useEffect(() => {
+    if (!hydrated || typeof isSignedIn !== "boolean" || sessionInitialized.current) return;
+    sessionInitialized.current = true;
+    initSession(isSignedIn);
+  }, [hydrated, isSignedIn, initSession]);
 
   // Track current page
   useEffect(() => {

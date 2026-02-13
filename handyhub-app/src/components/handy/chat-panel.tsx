@@ -1,12 +1,14 @@
 "use client";
 
 import { useCallback } from "react";
-import { X, Trash2, Wrench } from "lucide-react";
+import { X, Trash2, Wrench, History } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 import { useChatStore } from "@/stores";
 import type { ChatMessage } from "@/stores/chat-store";
 import { ChatMessages } from "./chat-messages";
 import { ChatInput } from "./chat-input";
+import { ChatHistory } from "./chat-history";
 
 export function ChatPanel() {
   const isOpen = useChatStore((s) => s.isOpen);
@@ -17,7 +19,11 @@ export function ChatPanel() {
   const decrementMessages = useChatStore((s) => s.decrementMessages);
   const clearMessages = useChatStore((s) => s.clearMessages);
   const messages = useChatStore((s) => s.messages);
+  const sessionId = useChatStore((s) => s.sessionId);
+  const isHistoryOpen = useChatStore((s) => s.isHistoryOpen);
+  const toggleHistory = useChatStore((s) => s.toggleHistory);
   const pathname = usePathname();
+  const { isSignedIn } = useAuth();
 
   const handleSend = useCallback(
     async (text: string) => {
@@ -54,6 +60,7 @@ export function ChatPanel() {
             messages: allMessages,
             currentPage: pathname,
             userRole: "visitor",
+            sessionId: sessionId || undefined,
           }),
         });
 
@@ -106,7 +113,7 @@ export function ChatPanel() {
         setStreaming(false);
       }
     },
-    [messages, pathname, addMessage, appendToLastMessage, setStreaming, decrementMessages]
+    [messages, pathname, sessionId, addMessage, appendToLastMessage, setStreaming, decrementMessages]
   );
 
   return (
@@ -129,6 +136,19 @@ export function ChatPanel() {
           </div>
         </div>
         <div className="flex items-center gap-1">
+          {isSignedIn && (
+            <button
+              onClick={toggleHistory}
+              className={`rounded-lg p-1.5 transition-colors ${
+                isHistoryOpen
+                  ? "bg-white/20 text-white"
+                  : "text-white/70 hover:bg-white/10 hover:text-white"
+              }`}
+              title="Chat history"
+            >
+              <History className="size-4" />
+            </button>
+          )}
           <button
             onClick={clearMessages}
             className="rounded-lg p-1.5 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
@@ -146,11 +166,15 @@ export function ChatPanel() {
         </div>
       </div>
 
-      {/* Messages */}
-      <ChatMessages />
-
-      {/* Input */}
-      <ChatInput onSend={handleSend} />
+      {/* Content area: history or chat */}
+      {isHistoryOpen ? (
+        <ChatHistory />
+      ) : (
+        <>
+          <ChatMessages />
+          <ChatInput onSend={handleSend} />
+        </>
+      )}
     </div>
   );
 }

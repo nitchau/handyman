@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBomModel } from "@/lib/gemini";
 import { buildBomPrompt } from "@/lib/prompts/bom-prompt";
-import type { BomProject, RoomDimensions } from "@/types";
+import { supabaseAdmin } from "@/lib/supabase/server";
+import type { BomProject, BomTask, RoomDimensions, WallDimension, CatalogMatchResult, PriceSource } from "@/types";
 import {
   ConfidenceTier,
   SpaceType,
@@ -110,11 +111,32 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Collect user-uploaded images
+    // Parse new optional fields
+    const roomDescription =
+      (formData.get("roomDescription") as string | null) || null;
+    const dimensionMode =
+      (formData.get("dimensionMode") as string | null) || "room";
+
+    let wallDimensions: WallDimension[] | null = null;
+    const wallDimsRaw = formData.get("wallDimensions");
+    if (wallDimsRaw && typeof wallDimsRaw === "string") {
+      try {
+        wallDimensions = JSON.parse(wallDimsRaw);
+      } catch {
+        // Ignore invalid wall dimensions
+      }
+    }
+
+    // Collect user-uploaded room images
     const images: File[] = [];
-    for (const [, value] of formData.entries()) {
+    const inspirationImages: File[] = [];
+    for (const [key, value] of formData.entries()) {
       if (value instanceof File && ALLOWED_TYPES.includes(value.type)) {
-        images.push(value);
+        if (key === "inspirationImages") {
+          inspirationImages.push(value);
+        } else {
+          images.push(value);
+        }
       }
     }
 
@@ -172,12 +194,30 @@ export async function POST(req: NextRequest) {
         .map((r) => ({ inlineData: r.value }));
     }
 
+    // Convert inspiration images to base64 inline data parts
+    const inspirationParts = await Promise.all(
+      inspirationImages.slice(0, 10).map(async (img) => {
+        const buffer = await img.arrayBuffer();
+        const base64 = Buffer.from(buffer).toString("base64");
+        return {
+          inlineData: {
+            mimeType: img.type,
+            data: base64,
+          },
+        };
+      })
+    );
+
     // Build prompt
     const prompt = buildBomPrompt({
       category_slug: projectData.category_slug,
       space_type: projectData.space_type,
       description: projectData.description,
       dimensions,
+      roomDescription: roomDescription ?? undefined,
+      dimensionMode: dimensionMode as "room" | "wall",
+      wallDimensions,
+      hasInspirationPhotos: inspirationParts.length > 0,
       designReference: designReference
         ? {
             designTitle: designReference.designTitle,
@@ -198,6 +238,13 @@ export async function POST(req: NextRequest) {
         "--- REFERENCE DESIGN PHOTOS (target aesthetic) ---"
       );
       contentParts.push(...refImageParts);
+    }
+
+    if (inspirationParts.length > 0) {
+      contentParts.push(
+        "--- DESIGN INSPIRATION PHOTOS (style and aesthetic reference) ---"
+      );
+      contentParts.push(...inspirationParts);
     }
 
     if (userImageParts.length > 0) {
@@ -248,39 +295,38 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Build complete BomProject with IDs and timestamps
+    // Build initial items with IDs
     const now = new Date().toISOString();
-    const bomProject: BomProject = {
-      id: crypto.randomUUID(),
-      title: parsed.title || "Untitled Project",
-      category_slug: parsed.category_slug || projectData.category_slug,
-      space_type: (parsed.space_type as SpaceType) || SpaceType.OTHER,
-      description: parsed.description || projectData.description,
-      dimensions,
-      photo_urls: [],
-      confidence_tier: ConfidenceTier.AI_ESTIMATE,
-      confidence_score: parsed.confidence_score ?? 0.7,
-      items: (parsed.items || []).map(
-        (item: {
-          name?: string;
-          type?: string;
-          quantity?: number;
-          unit?: string;
-          confidence?: number;
-          prices?: {
-            retailer?: string;
-            price?: number;
-            url?: string;
-            in_stock?: boolean;
-          }[];
-          notes?: string | null;
-        }) => ({
+    const rawItems = (parsed.items || []).map(
+      (item: {
+        name?: string;
+        type?: string;
+        task?: string;
+        quantity?: number;
+        waste_factor?: number;
+        quantity_with_waste?: number;
+        unit?: string;
+        confidence?: number;
+        prices?: {
+          retailer?: string;
+          price?: number;
+          url?: string;
+          in_stock?: boolean;
+        }[];
+        notes?: string | null;
+      }) => {
+        const qty = item.quantity ?? 1;
+        const wf = item.waste_factor ?? 0.1;
+        return {
           id: crypto.randomUUID(),
           name: item.name || "Unknown Item",
           type: (item.type as BomItemType) || BomItemType.MATERIAL,
-          quantity: item.quantity ?? 1,
+          task: item.task || "General",
+          quantity: qty,
+          waste_factor: wf,
+          quantity_with_waste: item.quantity_with_waste ?? Math.ceil(qty * (1 + wf) * 100) / 100,
           unit: item.unit || "each",
-          confidence: item.confidence ?? 0.7,
+          confidence: item.confidence ?? 70,
           prices: (item.prices || []).map(
             (p: {
               retailer?: string;
@@ -295,8 +341,85 @@ export async function POST(req: NextRequest) {
             })
           ),
           notes: item.notes || null,
-        })
-      ),
+          catalog_sku: null as string | null,
+          price_source: "ai_estimate" as PriceSource,
+        };
+      }
+    );
+
+    // Catalog matching: try to match each item against catalog_cache
+    for (const item of rawItems) {
+      try {
+        const { data } = await supabaseAdmin.rpc("match_catalog_item", {
+          p_name: item.name,
+          p_category: null,
+          p_limit: 1,
+        });
+        if (data && data.length > 0) {
+          const match = data[0] as CatalogMatchResult;
+          if (match.similarity_score > 0.3) {
+            item.catalog_sku = match.sku;
+            item.price_source = "catalog";
+            // Override the matching retailer's price with catalog price
+            const retailerKey = match.retailer as Retailer;
+            const existingPrice = item.prices.find(
+              (p: { retailer: Retailer }) => p.retailer === retailerKey
+            );
+            if (existingPrice) {
+              existingPrice.price = Number(match.price);
+            } else {
+              item.prices.push({
+                retailer: retailerKey,
+                price: Number(match.price),
+                url: match.url || "",
+                in_stock: match.in_stock,
+              });
+            }
+          }
+        }
+      } catch {
+        // Catalog matching is best-effort — continue without it
+      }
+    }
+
+    // Build tasks from parsed response
+    const parsedTasks = parsed.tasks || [];
+    const tasks: BomTask[] = parsedTasks.map(
+      (t: { name?: string; sortOrder?: number }, idx: number) => ({
+        id: crypto.randomUUID(),
+        name: t.name || `Task ${idx + 1}`,
+        sortOrder: t.sortOrder ?? idx + 1,
+        itemIds: rawItems
+          .filter((item: { task: string }) => item.task === (t.name || `Task ${idx + 1}`))
+          .map((item: { id: string }) => item.id),
+      })
+    );
+
+    // Ensure items referencing tasks not in the list get a fallback "General" task
+    const taskNames = new Set(tasks.map((t) => t.name));
+    const ungroupedItems = rawItems.filter(
+      (item: { task: string }) => !taskNames.has(item.task)
+    );
+    if (ungroupedItems.length > 0 && !taskNames.has("General")) {
+      tasks.push({
+        id: crypto.randomUUID(),
+        name: "General",
+        sortOrder: tasks.length + 1,
+        itemIds: ungroupedItems.map((item: { id: string }) => item.id),
+      });
+    }
+
+    const bomProject: BomProject = {
+      id: crypto.randomUUID(),
+      title: parsed.title || "Untitled Project",
+      category_slug: parsed.category_slug || projectData.category_slug,
+      space_type: (parsed.space_type as SpaceType) || SpaceType.OTHER,
+      description: parsed.description || projectData.description,
+      dimensions,
+      photo_urls: [],
+      confidence_tier: ConfidenceTier.AI_ESTIMATE,
+      confidence_score: parsed.confidence_score ?? 0.7,
+      items: rawItems,
       tools: (parsed.tools || []).map(
         (tool: {
           name?: string;
@@ -324,6 +447,8 @@ export async function POST(req: NextRequest) {
       },
       source_design_id: designReference?.designId ?? null,
       source_designer_id: designReference?.designerId ?? null,
+      tasks,
+      reference_object_detected: parsed.reference_object_detected ?? false,
       created_at: now,
       updated_at: now,
     };

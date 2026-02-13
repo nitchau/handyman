@@ -39,7 +39,7 @@ export function ConfidenceBadge({
       className={cn(config.className, className)}
     >
       {config.label}
-      {score !== undefined && ` · ${score}%`}
+      {score !== undefined && ` · ${Math.round(score * 100)}%`}
     </Badge>
   );
 }

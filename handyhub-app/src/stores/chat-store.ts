@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import type { ChatSession, ChatMessageRecord } from "@/types/database";
 
 export interface ChatMessage {
   id: string;
@@ -52,6 +53,21 @@ interface ChatState {
   greetingShownPages: Set<string>;
   hydrated: boolean;
 
+  // Session & auth state
+  sessionId: string | null;
+  isAuthenticated: boolean;
+
+  // History state
+  isHistoryOpen: boolean;
+  historyLoading: boolean;
+  historySessions: ChatSession[];
+  historyTotal: number;
+  historyPage: number;
+  selectedHistorySession: {
+    session: ChatSession;
+    messages: ChatMessageRecord[];
+  } | null;
+
   toggleOpen: () => void;
   setOpen: (open: boolean) => void;
   setCurrentPage: (page: string) => void;
@@ -63,6 +79,14 @@ interface ChatState {
   dismissGreeting: () => void;
   markGreetingShown: (page: string) => void;
   hydrate: () => void;
+
+  // Session & history actions
+  initSession: (isAuthenticated: boolean) => void;
+  toggleHistory: () => void;
+  loadHistory: (page?: number) => Promise<void>;
+  searchHistory: (query: string) => Promise<void>;
+  viewHistorySession: (sessionId: string) => Promise<void>;
+  closeHistorySession: () => void;
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
@@ -76,6 +100,16 @@ export const useChatStore = create<ChatState>((set, get) => ({
   greetingShownPages: new Set(),
   hydrated: false,
 
+  sessionId: null,
+  isAuthenticated: false,
+
+  isHistoryOpen: false,
+  historyLoading: false,
+  historySessions: [],
+  historyTotal: 0,
+  historyPage: 1,
+  selectedHistorySession: null,
+
   toggleOpen: () => {
     const { isOpen } = get();
     set({ isOpen: !isOpen, greetingDismissed: true });
@@ -88,12 +122,15 @@ export const useChatStore = create<ChatState>((set, get) => ({
   addMessage: (message) => {
     const messages = [...get().messages, message];
     set({ messages });
-    const state = get();
-    saveToStorage({
-      messages: messages.slice(-MAX_STORED_MESSAGES),
-      messagesRemaining: state.messagesRemaining,
-      rateLimitResetDate: state.rateLimitResetDate,
-    });
+    // Only persist to localStorage for anonymous users
+    if (!get().isAuthenticated) {
+      const state = get();
+      saveToStorage({
+        messages: messages.slice(-MAX_STORED_MESSAGES),
+        messagesRemaining: state.messagesRemaining,
+        rateLimitResetDate: state.rateLimitResetDate,
+      });
+    }
   },
 
   appendToLastMessage: (token) => {
@@ -113,22 +150,31 @@ export const useChatStore = create<ChatState>((set, get) => ({
   decrementMessages: () => {
     const remaining = Math.max(0, get().messagesRemaining - 1);
     set({ messagesRemaining: remaining });
-    const state = get();
-    saveToStorage({
-      messages: state.messages.slice(-MAX_STORED_MESSAGES),
-      messagesRemaining: remaining,
-      rateLimitResetDate: state.rateLimitResetDate,
-    });
+    // Only persist to localStorage for anonymous users
+    if (!get().isAuthenticated) {
+      const state = get();
+      saveToStorage({
+        messages: state.messages.slice(-MAX_STORED_MESSAGES),
+        messagesRemaining: remaining,
+        rateLimitResetDate: state.rateLimitResetDate,
+      });
+    }
   },
 
   clearMessages: () => {
+    const { isAuthenticated } = get();
     set({ messages: [] });
-    const state = get();
-    saveToStorage({
-      messages: [],
-      messagesRemaining: state.messagesRemaining,
-      rateLimitResetDate: state.rateLimitResetDate,
-    });
+    if (isAuthenticated) {
+      // Start a fresh session
+      set({ sessionId: crypto.randomUUID() });
+    } else {
+      const state = get();
+      saveToStorage({
+        messages: [],
+        messagesRemaining: state.messagesRemaining,
+        rateLimitResetDate: state.rateLimitResetDate,
+      });
+    }
   },
 
   dismissGreeting: () => set({ greetingDismissed: true }),
@@ -168,5 +214,90 @@ export const useChatStore = create<ChatState>((set, get) => ({
         hydrated: true,
       });
     }
+  },
+
+  // ── Session & History ─────────────────────────────────────
+
+  initSession: (isAuthenticated) => {
+    if (isAuthenticated) {
+      // Fresh session for each visit; clear messages from previous session
+      set({
+        isAuthenticated: true,
+        sessionId: crypto.randomUUID(),
+        messages: [],
+        messagesRemaining: MAX_MESSAGES_PER_DAY,
+      });
+    } else {
+      set({ isAuthenticated: false, sessionId: null });
+    }
+  },
+
+  toggleHistory: () => {
+    const { isHistoryOpen } = get();
+    if (!isHistoryOpen) {
+      // Opening history — load first page
+      set({ isHistoryOpen: true, selectedHistorySession: null });
+      get().loadHistory(1);
+    } else {
+      set({ isHistoryOpen: false, selectedHistorySession: null });
+    }
+  },
+
+  loadHistory: async (page = 1) => {
+    set({ historyLoading: true });
+    try {
+      const res = await fetch(`/api/chat/history?page=${page}&limit=20`);
+      if (!res.ok) throw new Error("Failed to load history");
+      const json = await res.json();
+      set({
+        historySessions: json.data,
+        historyTotal: json.meta.total,
+        historyPage: page,
+        historyLoading: false,
+      });
+    } catch {
+      set({ historyLoading: false });
+    }
+  },
+
+  searchHistory: async (query) => {
+    set({ historyLoading: true });
+    try {
+      const res = await fetch(
+        `/api/chat/history?q=${encodeURIComponent(query)}&page=1&limit=20`
+      );
+      if (!res.ok) throw new Error("Failed to search history");
+      const json = await res.json();
+      set({
+        historySessions: json.data,
+        historyTotal: json.meta.total,
+        historyPage: 1,
+        historyLoading: false,
+      });
+    } catch {
+      set({ historyLoading: false });
+    }
+  },
+
+  viewHistorySession: async (sessionId) => {
+    set({ historyLoading: true });
+    try {
+      const res = await fetch(`/api/chat/history/${sessionId}`);
+      if (!res.ok) throw new Error("Failed to load session");
+      const json = await res.json();
+      set({
+        selectedHistorySession: {
+          session: json.session,
+          messages: json.messages,
+        },
+        historyLoading: false,
+      });
+    } catch {
+      set({ historyLoading: false });
+    }
+  },
+
+  closeHistorySession: () => {
+    set({ selectedHistorySession: null });
   },
 }));

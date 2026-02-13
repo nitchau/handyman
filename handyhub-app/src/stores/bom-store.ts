@@ -2,9 +2,12 @@ import { create } from "zustand";
 import type {
   AIAnalysisStatus,
   BomProject,
+  DimensionMode,
+  FurniturePreferences,
   PreviewConversationTurn,
   PreviewStatus,
   RoomDimensions,
+  WallDimension,
 } from "@/types";
 
 export interface DesignReference {
@@ -38,6 +41,12 @@ interface BomState {
   mediaFiles: File[];
   mediaPreviews: string[];
   dimensions: RoomDimensions | null;
+  roomDescription: string;
+  dimensionMode: DimensionMode;
+  wallDimensions: WallDimension[];
+  inspirationFiles: File[];
+  inspirationPreviews: string[];
+  furniturePreferences: FurniturePreferences;
   analysisStatus: AIAnalysisStatus;
   result: BomProject | null;
   error: string | null;
@@ -55,6 +64,14 @@ interface BomState {
   addMedia: (files: File[]) => void;
   removeMedia: (index: number) => void;
   setDimensions: (dims: RoomDimensions | null) => void;
+  setRoomDescription: (desc: string) => void;
+  setDimensionMode: (mode: DimensionMode) => void;
+  addWall: () => void;
+  removeWall: (index: number) => void;
+  updateWall: (index: number, data: Partial<WallDimension>) => void;
+  addInspirationMedia: (files: File[]) => void;
+  removeInspirationMedia: (index: number) => void;
+  setFurniturePreferences: (prefs: FurniturePreferences) => void;
   setAnalysisStatus: (status: AIAnalysisStatus) => void;
   setResult: (result: BomProject) => void;
   setError: (error: string | null) => void;
@@ -74,12 +91,28 @@ const initialProjectData = {
   description: "",
 };
 
+const initialFurniturePreferences: FurniturePreferences = {
+  keepFurniture: true,
+  keepKitchenItems: true,
+  keepDecor: true,
+  notes: "",
+};
+
 export const useBomStore = create<BomState>((set, get) => ({
   currentStep: 0,
   projectData: { ...initialProjectData },
   mediaFiles: [],
   mediaPreviews: [],
   dimensions: null,
+  roomDescription: "",
+  dimensionMode: "room" as DimensionMode,
+  wallDimensions: [
+    { name: "", width_ft: 0, height_ft: 0 },
+    { name: "", width_ft: 0, height_ft: 0 },
+  ],
+  inspirationFiles: [],
+  inspirationPreviews: [],
+  furniturePreferences: { ...initialFurniturePreferences },
   analysisStatus: "idle" as AIAnalysisStatus,
   result: null,
   error: null,
@@ -117,6 +150,52 @@ export const useBomStore = create<BomState>((set, get) => ({
   },
 
   setDimensions: (dims) => set({ dimensions: dims }),
+
+  setRoomDescription: (desc) => set({ roomDescription: desc }),
+
+  setDimensionMode: (mode) => set({ dimensionMode: mode }),
+
+  addWall: () =>
+    set({
+      wallDimensions: [
+        ...get().wallDimensions,
+        { name: "", width_ft: 0, height_ft: 0 },
+      ],
+    }),
+
+  removeWall: (index) => {
+    const walls = [...get().wallDimensions];
+    walls.splice(index, 1);
+    set({ wallDimensions: walls });
+  },
+
+  updateWall: (index, data) => {
+    const walls = [...get().wallDimensions];
+    walls[index] = { ...walls[index], ...data };
+    set({ wallDimensions: walls });
+  },
+
+  addInspirationMedia: (files) => {
+    const newPreviews = files.map((f) => URL.createObjectURL(f));
+    set({
+      inspirationFiles: [...get().inspirationFiles, ...files],
+      inspirationPreviews: [...get().inspirationPreviews, ...newPreviews],
+    });
+  },
+
+  removeInspirationMedia: (index) => {
+    const previews = [...get().inspirationPreviews];
+    URL.revokeObjectURL(previews[index]);
+    previews.splice(index, 1);
+
+    const files = [...get().inspirationFiles];
+    files.splice(index, 1);
+
+    set({ inspirationFiles: files, inspirationPreviews: previews });
+  },
+
+  setFurniturePreferences: (prefs) => set({ furniturePreferences: prefs }),
+
   setAnalysisStatus: (status) => set({ analysisStatus: status }),
   setResult: (result) => set({ result }),
   setError: (error) => set({ error }),
@@ -141,12 +220,22 @@ export const useBomStore = create<BomState>((set, get) => ({
   reset: () => {
     // Revoke all object URLs before resetting
     get().mediaPreviews.forEach((url) => URL.revokeObjectURL(url));
+    get().inspirationPreviews.forEach((url) => URL.revokeObjectURL(url));
     set({
       currentStep: 0,
       projectData: { ...initialProjectData },
       mediaFiles: [],
       mediaPreviews: [],
       dimensions: null,
+      roomDescription: "",
+      dimensionMode: "room" as DimensionMode,
+      wallDimensions: [
+        { name: "", width_ft: 0, height_ft: 0 },
+        { name: "", width_ft: 0, height_ft: 0 },
+      ],
+      inspirationFiles: [],
+      inspirationPreviews: [],
+      furniturePreferences: { ...initialFurniturePreferences },
       analysisStatus: "idle" as AIAnalysisStatus,
       result: null,
       error: null,
